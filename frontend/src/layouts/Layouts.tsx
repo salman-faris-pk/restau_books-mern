@@ -1,27 +1,26 @@
+import Header from "../components/Header";
+import { Outlet } from "react-router-dom"
+import Hero from "../components/Hero";
+import Footer from "../components/Footer";
 
 
-
-
-
-interface Props {
-    children: React.ReactNode;
-  }
-
-const MainLayout =({ children }: Props)=>{
+const MainLayout =( )=>{
 
 
     return (
         <div className="flex flex-col min-h-screen">
 
-           {/* <Header /> */}
-           {/* <Hero /> */}
+           <Header />
+           <Hero />
 
            <div className="container mx-auto">
              {/* <SearchBar /> */}
             </div>
 
-            <div className="container mx-auto py-10 flex-1">{children}</div>
-              {/* <Footer /> */}
+            <div className="container mx-auto py-10 flex-1">
+               <Outlet />
+            </div>
+              <Footer />
             
         </div>
     )
@@ -29,21 +28,23 @@ const MainLayout =({ children }: Props)=>{
 
 
 
-const AuthLayout =({ children }: Props)=>{
+const AuthLayout =()=>{
 
    
     return (
         <div className="flex flex-col min-h-screen">
 
-           {/* <Header /> */}
-           {/* <Hero /> */}
+           <Header />
+           <Hero />
 
            <div className="container mx-auto">
              {/* <SearchBar /> */}
             </div>
 
-            <div className="container mx-auto py-10 flex-1">{children}</div>
-              {/* <Footer /> */}
+            <div className="container mx-auto py-10 flex-1">
+              <Outlet />
+            </div>
+              <Footer />
             
         </div>
     )
