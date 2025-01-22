@@ -4,7 +4,7 @@ import SignOutButton from "./SignOutButton";
 
 const Header = () => {
 
-    const isLoggedIn= true;
+    const isLoggedIn= false;
 
   return (
     <div className="bg-blue-800 py-6">
