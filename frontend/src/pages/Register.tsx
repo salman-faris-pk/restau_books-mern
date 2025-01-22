@@ -109,7 +109,6 @@ const Register = () => {
             },
           })}
         />
-
           <button
           type="button"
           onClick={()=> setIsPasswordVisible((prev) => !prev)}

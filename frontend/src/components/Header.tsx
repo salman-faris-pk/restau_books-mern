@@ -29,7 +29,9 @@ const Header = () => {
               >
                 My Hotels
               </Link>
+
               <SignOutButton />
+              
             </>
           ) : (
             <Link
