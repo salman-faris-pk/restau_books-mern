@@ -1,9 +1,11 @@
 import { useState } from "react";
 import { useForm} from "react-hook-form"
 import { FaEye, FaEyeSlash } from "react-icons/fa";
-import { useMutation } from '@tanstack/react-query';
+import { useMutation,useQueryClient } from '@tanstack/react-query';
 import * as apiClient from "../api/api-client"
 import { useNavigate } from "react-router-dom";
+import { useAppContext } from "../contexts/AppContext";
+
 
 
 export type RegisterFormData = {
@@ -19,8 +21,9 @@ const Register = () => {
 
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
   const [isConfirmPasswordVisible, setIsConfirmPasswordVisible] = useState(false);
-
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
+  const { showToast } = useAppContext();
 
     const {
       register,
@@ -34,12 +37,17 @@ const Register = () => {
     const mutation = useMutation({
       mutationFn: apiClient.register, 
       onSuccess: async () => {
-        console.log('Registration successful');
+        showToast({message:"Registration Success!", type: "SUCCESS"});
+        await queryClient.invalidateQueries({ queryKey: ["validateToken"]})
         reset();
-        // navigate('/');
+        navigate('/');
       },
       onError: (error: Error) => {
-        console.log(error.message);
+        if(error.message === "Request failed with status code 400"){
+          showToast({message: "User already exists",type:"ERROR"})
+        }else{
+          showToast({message: error.message,type:"ERROR"})
+        }
       },
     });
   

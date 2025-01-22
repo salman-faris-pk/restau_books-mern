@@ -6,7 +6,7 @@ import Footer from "../components/Footer";
 
 const MainLayout =( )=>{
 
-
+  // const { isLoggedIn } = useAppContext();
     return (
         <div className="flex flex-col min-h-screen">
 
