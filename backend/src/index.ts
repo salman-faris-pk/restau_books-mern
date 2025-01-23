@@ -5,10 +5,12 @@ import mongoose from "mongoose"
 import userRoutes from "./routes/user.route";
 import cookieParser from "cookie-parser";
 import path from "path";
+import CronJob from "./cron"
 
 
 mongoose.connect(process.env.MONGODB_CONNECTION_STRING as string)
 
+CronJob.start();
 
 const app = express();
 app.use(express.json());
