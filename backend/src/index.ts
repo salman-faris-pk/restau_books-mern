@@ -4,10 +4,11 @@ import "dotenv/config";
 import mongoose from "mongoose"
 import userRoutes from "./routes/user.route";
 import cookieParser from "cookie-parser";
+import path from "path";
 
 
 mongoose.connect(process.env.MONGODB_CONNECTION_STRING as string)
- 
+
 
 const app = express();
 app.use(express.json());
@@ -19,10 +20,16 @@ app.use(cors({
   })
 );
 
+
+app.use(express.static(path.join(__dirname, "../../frontend/dist")));
+
 app.use("/api/user", userRoutes);
 
+app.get("*", (req: Request, res: Response) => {
+  res.sendFile(path.join(__dirname, "../../frontend/dist/index.html"));
+});
 
-  
+
   app.listen(7000, () => {
-    console.log("server running on localhost:7000");
+    console.log("server running on http://localhost:7000");
   });
