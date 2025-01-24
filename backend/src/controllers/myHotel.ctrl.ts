@@ -26,7 +26,6 @@ const AddHotels=async(req: Request,res:Response) :Promise<void> => {
     try {
         const imageFiles= req.files as Express.Multer.File[];
         
-
         const imageUrls = await uploadImages(imageFiles);
 
         const newHotel: HotelType = {

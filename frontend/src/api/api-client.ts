@@ -49,3 +49,17 @@ export const SignOut= async()=>{
   };
 
 };
+
+
+
+export const addMyHote =async(hotelFormdata: FormData) => {
+
+  const response=await  axiosInstance.post("/my-hotels", hotelFormdata);
+    
+  if (response.status !== 200) {
+    throw new Error("Failed to add hotel");
+  };
+
+  return response.data;
+
+};

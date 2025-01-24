@@ -1,8 +1,9 @@
 import { createBrowserRouter, RouterProvider } from "react-router-dom"
-import { MainLayout } from "./layouts/Layouts"
+import { MainLayout ,AuthLayout } from "./layouts/Layouts"
 import Homepage from "./pages/Homepage";
 import Register from "./pages/Register";
 import SignIn from "./pages/SignIn";
+import AddHotel from "./pages/AddHotel";
 
 
 
@@ -28,13 +29,19 @@ function App() {
           element: <SignIn />
         },
 
-
-      
-
-
       ]
     },
 
+    {
+      path:"/",
+      element: <AuthLayout />,
+      children:[
+        {
+          path:"/add-hotel",
+          element: <AddHotel />
+        },
+      ]
+    },
 
 
   ]);

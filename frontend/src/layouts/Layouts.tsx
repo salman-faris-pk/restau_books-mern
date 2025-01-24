@@ -1,12 +1,13 @@
 import Header from "../components/Header";
-import { Outlet } from "react-router-dom"
+import { Navigate, Outlet, useLocation } from "react-router-dom"
 import Hero from "../components/Hero";
 import Footer from "../components/Footer";
+import { useAppContext } from "../contexts/AppContext";
 
 
 const MainLayout =( )=>{
 
-  // const { isLoggedIn } = useAppContext();
+
     return (
         <div className="flex flex-col min-h-screen">
 
@@ -29,6 +30,13 @@ const MainLayout =( )=>{
 
 
 const AuthLayout =()=>{
+
+  const location=useLocation()
+
+  const { isLoggedIn } = useAppContext();
+
+   if(!isLoggedIn) return <Navigate to={"/sign-in"} state={{ from: location }} replace/>
+
 
    
     return (
