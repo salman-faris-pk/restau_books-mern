@@ -1,6 +1,6 @@
 import express, {Request,Response} from "express"
 import {Login, Register,getMe} from "../controllers/user.cotrls"
-import { check} from "express-validator"
+import { check } from "express-validator"
 import { validateRequest } from "../middlewares/validateMiddleware"
 import verifyToken from "../middlewares/auth"
 
