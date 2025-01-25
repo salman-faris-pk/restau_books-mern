@@ -56,7 +56,7 @@ export const addMyHote =async(hotelFormdata: FormData) => {
 
   const response=await  axiosInstance.post("/my-hotels", hotelFormdata);
     
-  if (response.status !== 200) {
+  if (response.status !== 201) {
     throw new Error("Failed to add hotel");
   };
 

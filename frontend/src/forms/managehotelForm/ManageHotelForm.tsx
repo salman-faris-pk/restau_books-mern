@@ -30,10 +30,11 @@ interface Props{
  hotel?: HotelType;
  onSave: (hotelFormData: FormData)=> void;
  isLoading: boolean;
+ setResetform: (resetFunc: () => void) => void;
 };
 
 
-const ManageHotelForm = ({ onSave, isLoading, hotel}: Props) => {
+const ManageHotelForm = ({ onSave, isLoading, hotel,setResetform}: Props) => {
 
   const formMethods= useForm<HotelFormData>()
   const { handleSubmit, reset }=formMethods;
@@ -41,6 +42,11 @@ const ManageHotelForm = ({ onSave, isLoading, hotel}: Props) => {
   useEffect(()=>{
     reset(hotel);
   },[hotel,reset]);
+
+  useEffect(() => {
+    setResetform(() => reset);
+  }, [setResetform, reset]);
+
 
 
 const onSubmit = handleSubmit((formDataJson: HotelFormData) => {
@@ -69,13 +75,15 @@ const onSubmit = handleSubmit((formDataJson: HotelFormData) => {
       });
     }
   
-    formDataJson.imageFiles.forEach((imageFile) => {
-      formData.append("imageFiles", imageFile);
-    });
-  
+    if (formDataJson.imageFiles) {
+        Array.from(formDataJson.imageFiles).forEach((imageFile) => {
+          formData.append(`imageFiles`, imageFile);
+        });
+      }
+      
     onSave(formData);
 
-     reset();
+    
   });
 
 
