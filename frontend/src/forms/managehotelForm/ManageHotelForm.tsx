@@ -79,8 +79,8 @@ const onSubmit = handleSubmit((formDataJson: HotelFormData) => {
         Array.from(formDataJson.imageFiles).forEach((imageFile) => {
           formData.append(`imageFiles`, imageFile);
         });
-      }
-      
+      };
+
     onSave(formData);
 
     
@@ -112,5 +112,3 @@ const onSubmit = handleSubmit((formDataJson: HotelFormData) => {
 }
 
 export default ManageHotelForm
-
-

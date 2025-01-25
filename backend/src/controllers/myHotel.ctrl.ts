@@ -28,6 +28,9 @@ const AddHotels=async(req: Request,res:Response) :Promise<void> => {
         
         const imageUrls = await uploadImages(imageFiles);
 
+        console.log("imageUrls",imageUrls)
+        
+
         const newHotel: HotelType = {
             ...req.body,
             imageUrls,

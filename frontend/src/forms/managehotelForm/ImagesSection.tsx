@@ -49,6 +49,7 @@ const ImagesSection = () => {
       setIsTouched(true)
     }
   };
+  
 
   useEffect(() => {
 
