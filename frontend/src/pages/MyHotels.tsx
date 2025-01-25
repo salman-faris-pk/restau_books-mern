@@ -6,26 +6,23 @@ import { BiHotel, BiMoney, BiStar } from "react-icons/bi";
 
 
 
+
 const MyHotels = () => {
 
   const navigate=useNavigate();
+
+
 
   const {data: hotelData,isLoading}=useQuery({
     queryKey:["fetchMyHotels"],
     queryFn: apiClient.fetchMyHotels,
   });
 
-  console.log("hotelDatas",hotelData);
-
-  if (!hotelData) {
-    return <span>No Hotels found</span>;
-  };
-  
-
   if(isLoading){
-    return <span>Loading...</span>;
-  }
-
+    return <div className="flex items-center justify-center">
+       <div className="border-t-4 border-blue-600 border-solid w-16 h-16 rounded-full animate-spin"></div>
+    </div>;
+  };
 
 
   return (
@@ -41,19 +38,19 @@ const MyHotels = () => {
       </Link>
     </span>
     <div className="grid grid-cols-1 gap-8">
-      {hotelData.map((hotel) => (
+
+    {hotelData && hotelData.length === 0 &&
+     <span className="text-gray-400"> Start adding rooms to manage your listings efficiently. Click the button above to add!</span>
+    }
+
+      {hotelData && hotelData.map((hotel) => (
         <div
           data-testid="hotel-card"
           className="flex flex-col justify-between border border-slate-300 rounded-lg p-5 gap-5 cursor-pointer"
           onClick={()=> navigate(`/edit-hotel/${hotel._id}`)}
         >
           <h2 className="text-2xl font-bold">{hotel.name}</h2>
-          <div className="whitespace-pre-line flex gap-x-5">
-            <img src={hotel.imageUrls[0]} className="w-[100px] h-[90px]"/>
-            <p className="text-ellipsis overflow-hidden md:line-clamp-none line-clamp-4 text-sm">
-               {hotel.description}
-            </p>
-          </div>
+          <div className="whitespace-pre-line">{hotel.description}</div>
 
           <div className="grid grid-cols-5 gap-2">
             <div className="border border-slate-300 rounded-sm p-3 flex items-center">
