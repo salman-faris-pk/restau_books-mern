@@ -1,3 +1,4 @@
+import { HotelType } from "../../../backend/src/types/types";
 import { RegisterFormData } from "../pages/Register"
 import { SignInFormData } from "../pages/SignIn";
 import axiosInstance from "./api-instance";
@@ -52,7 +53,7 @@ export const SignOut= async()=>{
 
 
 
-export const addMyHote =async(hotelFormdata: FormData) => {
+export const addMyHotel =async(hotelFormdata: FormData) => {
 
   const response=await  axiosInstance.post("/my-hotels", hotelFormdata);
     
@@ -61,5 +62,17 @@ export const addMyHote =async(hotelFormdata: FormData) => {
   };
 
   return response.data;
+
+};
+
+
+export const fetchMyHotels= async() : Promise<HotelType[]> => {
+    const response = await axiosInstance.get("/my-hotels");
+
+    if (response.status !== 200) {
+      throw new Error("Error fetching hotels");
+    };
+  
+    return response.data;
 
 };

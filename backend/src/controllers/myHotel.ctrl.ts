@@ -25,12 +25,8 @@ const AddHotels=async(req: Request,res:Response) :Promise<void> => {
    
     try {
         const imageFiles= req.files as Express.Multer.File[];
-        console.log("imageUrls",imageFiles)
         
         const imageUrls = await uploadImages(imageFiles);
-
-        console.log("imageUrls",imageUrls)
-        
 
         const newHotel: HotelType = {
             ...req.body,
@@ -53,9 +49,9 @@ const AddHotels=async(req: Request,res:Response) :Promise<void> => {
 
 const GetMyHotels = async(req:Request,res:Response): Promise<void> => {
     try {
-        const hotels= await Hotel.find({ userId: req.userId });
+        const hotels= await Hotel.find({ userId: req.userId }).sort({ createdAt: -1 })
         
-        res.json(hotels);
+        res.status(200).json(hotels);
 
     } catch (error) {
         res.status(500).json({ message: "Error fetching hotels" });

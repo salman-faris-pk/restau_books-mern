@@ -11,7 +11,7 @@ const AddHotel = () => {
     const [resetForm, setResetform] = useState<(() => void) | null>(null);
 
     const { mutate,isPending}=useMutation({
-        mutationFn: apiClient.addMyHote,
+        mutationFn: apiClient.addMyHotel,
         onSuccess: ()=> {
             showToast({ message: "Hotel Saved!", type: "SUCCESS" });
             resetForm?.();

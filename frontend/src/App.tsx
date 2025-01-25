@@ -4,6 +4,7 @@ import Homepage from "./pages/Homepage";
 import Register from "./pages/Register";
 import SignIn from "./pages/SignIn";
 import AddHotel from "./pages/AddHotel";
+import MyHotels from "./pages/MyHotels";
 
 
 
@@ -40,6 +41,11 @@ function App() {
           path:"/add-hotel",
           element: <AddHotel />
         },
+        {
+          path:"/my-hotels",
+          element: <MyHotels />
+        },
+        
       ]
     },
 

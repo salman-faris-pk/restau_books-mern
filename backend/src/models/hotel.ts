@@ -34,6 +34,8 @@ const bookingSchema = new mongoose.Schema<BookingType>({
       ],
     lastUpdated: { type: Date, required: true },
     bookings: [bookingSchema],
+  },{
+    timestamps: true
   });
 
 

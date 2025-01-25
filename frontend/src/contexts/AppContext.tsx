@@ -33,7 +33,7 @@ export const AppContextProvider=({children}: {children: React.ReactNode})=>{
             showToast: (toastMessage) => {
                 setToast(toastMessage)
             },
-            isLoggedIn: !isError,
+            isLoggedIn: !isError,  //if not error means logedin true
           }}>
           
           {toast && (
