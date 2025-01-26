@@ -76,3 +76,40 @@ export const fetchMyHotels= async() : Promise<HotelType[]> => {
     return response.data;
 
 };
+
+
+export const fetchMyHotelById = async(hotelId:string) : Promise<HotelType> =>{
+      const response =  await axiosInstance.get(`/my-hotels/${hotelId}`);
+      if (response.status !== 200) {
+        throw new Error("Error fetching hotels");
+      };
+
+      return response.data;
+};
+
+
+export const updateMyHotelById = async(hotelFormdata: FormData) =>{
+    
+  const hotelId = hotelFormdata.get("hotelId");
+  const response = await axiosInstance.put(`/my-hotels/${hotelId}`, hotelFormdata);
+  if (response.status !== 201) {
+    throw new Error("Failed to update Hotel");
+  };
+
+  return response.data;
+
+};
+
+
+export const DeleteImages =async(hotelId:string,imageUrl:string)=>{
+  
+  const response = await axiosInstance.delete(`my-hotels/images/${hotelId}`,{
+    data: { imageUrl }
+  })
+  if (response.status !== 200) {
+    throw new Error("Failed to delete image");
+  };
+
+  return response.data;
+
+};

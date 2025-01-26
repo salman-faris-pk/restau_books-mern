@@ -1,5 +1,5 @@
 import express from "express"
-import { AddHotels,GetMyHotels } from "../controllers/myHotel.ctrl"
+import { AddHotels,GetMyHotels,GetHotel,EditHotel,DeleteImages} from "../controllers/myHotel.ctrl"
 import verifyToken from "../middlewares/auth";
 import { body } from "express-validator";
 import multer from "multer"
@@ -33,6 +33,10 @@ router.post("/",verifyToken,[
 
 
 router.get("/",verifyToken,GetMyHotels)
+
+router.get("/:id",verifyToken,GetHotel)
+router.delete("/images/:hotelId",verifyToken, DeleteImages);
+router.put("/:hotelId",verifyToken,upload.array("imageFiles"),EditHotel)
 
 
 

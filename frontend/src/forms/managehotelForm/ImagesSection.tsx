@@ -1,6 +1,10 @@
 import { useFormContext } from "react-hook-form";
 import { HotelFormData } from "./ManageHotelForm";
 import { useEffect, useState } from "react";
+import { useLocation, useParams } from "react-router-dom";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import * as apiClient from "../../api/api-client"
+
 
 const ImagesSection = () => {
   const {
@@ -13,9 +17,14 @@ const ImagesSection = () => {
   } = useFormContext<HotelFormData>();
 
   const [isTouched, setIsTouched] = useState(false); 
+  const location=useLocation();
 
+  const { hotelId } = useParams<{ hotelId: string }>();
+  const queriClient=useQueryClient();
+ 
   const existingImageUrls = watch("imageUrls");
   const existingImageFiles = watch("imageFiles") || [];
+
 
   const handleDelete = (
     event: React.MouseEvent<HTMLButtonElement, MouseEvent>,
@@ -78,10 +87,49 @@ const ImagesSection = () => {
   }, [existingImageFiles, existingImageUrls, errors.imageFiles, setError, clearErrors,isTouched]);
 
   const imageFiles = getValues("imageFiles");
+  const imageUrls = getValues("imageUrls");
+
+  const EditpageLoc = location.pathname !== "/add-hotel" ;
+
+
+  const { mutate, isPending} = useMutation({
+    mutationFn: ({ hotelId, imageUrl }: { hotelId: string; imageUrl: string }) =>
+      apiClient.DeleteImages(hotelId, imageUrl),
+    onSuccess: ()=>{
+      queriClient.invalidateQueries({queryKey:["fetchMyHotelById"]})
+    }
+  });
+  
+  const handleImgDelete = (imageUrl: string) => {
+    if (!hotelId) {
+      console.error("Hotel ID is missing!");
+      return;
+    }
+    mutate({ hotelId, imageUrl });
+  };
   
   return (
     <div>
       <h2 className="text-2xl font-bold mb-3">Images</h2>
+       
+       {EditpageLoc && imageUrls && (
+         <div className="grid grid-cols-6 mb-6 gap-4">
+            {imageUrls.map((url:string,i)=> (
+             <div className="relative group" key={i}>
+                <img src={url} alt={`img ${i}`} className="min-h-full object-cover" />
+                <button
+                  onClick={() => handleImgDelete(url)}
+                   disabled={isPending}
+                   className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 text-white opacity-0 group-hover:opacity-100 transition-opacity"
+                   >
+            {isPending ? "..." : "Delete"}
+           </button>
+              </div>
+            ))}
+          </div>
+       )}
+
+
       <div className="border rounded p-4 flex flex-col gap-4">
         {imageFiles && imageFiles.length > 0 && (
           <div className="grid grid-cols-6 gap-4">
@@ -108,7 +156,7 @@ const ImagesSection = () => {
           accept="image/*"
           className="w-full text-gray-700 font-normal"
           onChange={handleFileChange}
-          required
+          required={!EditpageLoc}
         />
       </div>
       {errors.imageFiles && (

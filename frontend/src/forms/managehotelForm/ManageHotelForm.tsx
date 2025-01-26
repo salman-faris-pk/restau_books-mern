@@ -48,7 +48,6 @@ const ManageHotelForm = ({ onSave, isLoading, hotel,setResetform}: Props) => {
   }, [setResetform, reset]);
 
 
-
 const onSubmit = handleSubmit((formDataJson: HotelFormData) => {
     const formData = new FormData();
     if (hotel) {

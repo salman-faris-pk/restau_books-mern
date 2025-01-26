@@ -5,6 +5,7 @@ import Register from "./pages/Register";
 import SignIn from "./pages/SignIn";
 import AddHotel from "./pages/AddHotel";
 import MyHotels from "./pages/MyHotels";
+import EditHotel from "./pages/EditHotel";
 
 
 
@@ -45,6 +46,10 @@ function App() {
           path:"/my-hotels",
           element: <MyHotels />
         },
+        {
+          path:"/edit-hotel/:hotelId",
+          element: <EditHotel />
+        }
         
       ]
     },
