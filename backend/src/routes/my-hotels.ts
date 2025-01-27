@@ -40,8 +40,4 @@ router.put("/:hotelId",verifyToken,upload.array("imageFiles"),EditHotel)
 
 
 
-
-
-
-
 export default router;
