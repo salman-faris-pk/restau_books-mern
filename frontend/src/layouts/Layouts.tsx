@@ -3,6 +3,7 @@ import { Navigate, Outlet, useLocation } from "react-router-dom"
 import Hero from "../components/Hero";
 import Footer from "../components/Footer";
 import { useAppContext } from "../contexts/AppContext";
+import SearchBar from "../components/SearchBar";
 
 
 const MainLayout =( )=>{
@@ -15,7 +16,7 @@ const MainLayout =( )=>{
            <Hero />
 
            <div className="container mx-auto">
-             {/* <SearchBar /> */}
+             <SearchBar />
             </div>
 
             <div className="container mx-auto py-10 flex-1">
@@ -46,7 +47,7 @@ const AuthLayout =()=>{
            <Hero />
 
            <div className="container mx-auto">
-             {/* <SearchBar /> */}
+             <SearchBar />
             </div>
 
             <div className="container mx-auto py-10 flex-1">

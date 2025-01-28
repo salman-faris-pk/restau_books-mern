@@ -109,6 +109,7 @@ const Searchhotel = async (req: Request, res: Response): Promise<void> => {
       $lte: parseInt(queryParams.maxPrice).toString(),
     };
   };
+  
 
   return constructedQuery;
 

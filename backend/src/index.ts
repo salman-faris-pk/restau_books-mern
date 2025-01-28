@@ -8,6 +8,7 @@ import cookieParser from "cookie-parser";
 import path from "path";
 import CronJob from "./cron"
 import { v2 as cloudinary} from "cloudinary"
+import hotelRoutes from "./routes/hotels";
 
 
 
@@ -37,6 +38,8 @@ app.use(express.static(path.join(__dirname, "../../frontend/dist")));
 
 app.use("/api/user", userRoutes);
 app.use("/api/my-hotels",myHotelRoutes)
+app.use("/api/hotels",hotelRoutes)
+
 
 app.get("*", (req: Request, res: Response) => {
   res.sendFile(path.join(__dirname, "../../frontend/dist/index.html"));
