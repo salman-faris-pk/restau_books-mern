@@ -8,6 +8,8 @@ import SearchBar from "../components/SearchBar";
 
 const MainLayout =( )=>{
 
+  const location=useLocation()
+  const isHidden = location.pathname === "/sign-in" || location.pathname === "/register";
 
     return (
         <div className="flex flex-col min-h-screen">
@@ -15,7 +17,7 @@ const MainLayout =( )=>{
            <Header />
            <Hero />
 
-           <div className="container mx-auto">
+           <div className={`${isHidden ? "hidden" : "block"} container mx-auto`}>
              <SearchBar />
             </div>
 
@@ -35,6 +37,7 @@ const AuthLayout =()=>{
   const location=useLocation()
 
   const { isLoggedIn } = useAppContext();
+  const isHidden = location.pathname === "/sign-in" || location.pathname === "/register";
 
    if(!isLoggedIn) return <Navigate to={"/sign-in"} state={{ from: location }} replace/>
 
@@ -46,7 +49,7 @@ const AuthLayout =()=>{
            <Header />
            <Hero />
 
-           <div className="container mx-auto">
+            <div className={`${isHidden ? "hidden" : "block"} container mx-auto`}>
              <SearchBar />
             </div>
 

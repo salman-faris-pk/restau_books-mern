@@ -24,10 +24,7 @@ const Searchhotel = async (req: Request, res: Response): Promise<void> => {
       };
 
       const pageSize = 5;
-      const pageNumber = parseInt(
-        req.query.page ? req.query.page.toString() : "1"
-      );
-
+      const pageNumber = parseInt(req.query.page ? req.query.page.toString() : "1");
       const skip = (pageNumber - 1) * pageSize;  // if you're on page 4 and the page size is 6, you will skip the first 18 items and start displaying the 19th item on page 4.
   
      const hotels= await Hotel.find(query)
@@ -46,9 +43,10 @@ const Searchhotel = async (req: Request, res: Response): Promise<void> => {
          },
      };
 
-     res.json(response);
+     res.status(200).json(response);
     
    } catch (error) {
+    console.error("Error searching hotels:", error);
     res.status(500).json({ message: "Something went wrong" });
    }
   };

@@ -10,6 +10,8 @@ const SearchBar = () => {
 
     const search=useSearchContext()
     const navigate=useNavigate()
+  
+    
 
     const [destination, setDestination] = useState<string>(search.destination);
     const [checkIn, setCheckIn] = useState<Date>(search.checkIn);
@@ -40,7 +42,7 @@ const SearchBar = () => {
     <form
     onSubmit={handleSubmit}
     className="-mt-8 p-3 bg-orange-400 rounded shadow-md grid grid-cols-2 lg:grid-cols-3 2xl:grid-cols-5 items-center gap-4"
-  >
+    >
     <div className="flex flex-row items-center flex-1 bg-white p-2">
       <MdTravelExplore size={25} className="mr-2" />
       <input

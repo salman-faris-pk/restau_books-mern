@@ -6,6 +6,7 @@ import SignIn from "./pages/SignIn";
 import AddHotel from "./pages/AddHotel";
 import MyHotels from "./pages/MyHotels";
 import EditHotel from "./pages/EditHotel";
+import Search from "./pages/Search";
 
 
 
@@ -20,6 +21,10 @@ function App() {
         {
           path:"/",
           element: <Homepage/>
+        },
+        {
+          path:"/search",
+          element: <Search />
         },
 
         {

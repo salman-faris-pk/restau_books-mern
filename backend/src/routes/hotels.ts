@@ -11,7 +11,4 @@ router.get("/search",Searchhotel)
 
 
 
-
-
-
 export default router;
