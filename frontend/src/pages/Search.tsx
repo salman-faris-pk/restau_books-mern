@@ -8,12 +8,14 @@ import FacilitiesFilter from "../components/FacilitiesFilter";
 import PriceFilter from "../components/PriceFilter";
 import SearchResultsCard from "../components/SearchResultsCard";
 import Pagination from "../components/Pagination";
+import { MdArrowForwardIos } from "react-icons/md";
 
 
 const Search = () => {
 
   const search=useSearchContext();
-
+  
+  const [showfilter,SetShowfilter]=useState<boolean>(false)
   const [page, setPage] = useState<number>(1);
   const [selectedStars, setSelectedStars] = useState<string[]>([]);
   const [selectedHotelTypes, setSelectedHotelTypes] = useState<string[]>([]);
@@ -42,7 +44,7 @@ const Search = () => {
   
   if (isLoading) {
     return (
-    <div className="flex justify-center items-center h-screen">
+    <div className="flex justify-center items-center">
      <div className="animate-spin rounded-full h-14 w-14 border-t-2 border-b-2 border-blue-500"></div>
      </div>
     )
@@ -53,7 +55,8 @@ const Search = () => {
         <div className="text-red-500">{error.message}</div>
       </div>
     );
-  }
+  };
+
   
 
   const handleStarsChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -88,14 +91,21 @@ const Search = () => {
     );
   };
   
+  
+  
   return (
     <div className="grid grid-cols-1 lg:grid-cols-[250px_1fr] gap-5">
 
-      <div className="rounded-lg border border-slate-300 p-5 h-fit sticky top-10">
-        <div className="space-y-5">
-          <h3 className="text-lg font-semibold border-b border-slate-300 pb-5">
+      <div className="rounded-lg border border-slate-300 p-5 h-fit md:sticky md:top-10">
+
+         <h3 className="md:hidden  text-xl flex items-center cursor-pointer gap-2 pb-5" onClick={()=> SetShowfilter(!showfilter)}>
+            FILTERS <MdArrowForwardIos size={16} className={`text-gray-300 ${showfilter ? "rotate-90" : ""}`}/>
+          </h3>
+         <h3 className="hidden md:block text-lg font-semibold border-b border-slate-300 pb-5">
             Filter by:
           </h3>
+
+        <div className={`space-y-5 ${showfilter ? " " : "hidden"} md:block`}>
           <StarRatingFilter
             selectedStars={selectedStars}
             onChange={handleStarsChange}
@@ -136,9 +146,11 @@ const Search = () => {
             </option>
           </select>
         </div>
-        {hotelData?.data?.map((hotel) => (
-          <SearchResultsCard hotel={hotel} />
-        ))}
+         {hotelData?.data?.length === 0 ? (
+          <p className="text-center font-medium text-gray-500">No hotels founds...</p>
+            ) : (
+             hotelData?.data?.map((hotel) => <SearchResultsCard key={hotel._id} hotel={hotel} />)
+          )}
         <div>
           <Pagination
             page={hotelData?.pagination?.page || 1}
