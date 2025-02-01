@@ -5,6 +5,26 @@ import { HotelSearchResponse } from "../types/types";
 
 
 
+
+
+
+const GetSinglHotel = async(req:Request,res:Response) => {
+
+  const id = req.params.id.toString();
+
+  try {
+
+    const hotel = await Hotel.findById(id);
+    res.status(200).json(hotel);
+    
+  } catch (error) {
+    res.status(500).json({ message: "Error fetching hotel" });
+  }
+};
+
+
+
+
 const Searchhotel = async (req: Request, res: Response): Promise<void> => {
    try {
 
@@ -118,4 +138,5 @@ const Searchhotel = async (req: Request, res: Response): Promise<void> => {
 
 export {
     Searchhotel,
+    GetSinglHotel,
 }

@@ -129,6 +129,7 @@ export type SearchParams = {
   sortOption?: string;
 };
 
+
 export const SearchHotels =async(searchParams: SearchParams) : Promise<HotelSearchResponse> => {
   
    const queryParams= new URLSearchParams();
@@ -156,4 +157,15 @@ export const SearchHotels =async(searchParams: SearchParams) : Promise<HotelSear
    };
   
    return response.data;
+};
+
+
+export const fetchHotelbyId = async(hotelId:string): Promise<HotelType> => {
+  const response = await  axiosInstance.get(`/hotels/${hotelId}`);
+  if(response.status !== 200) {
+    throw new Error("Error fetching Hotels");
+  }
+
+  return response.data;
+
 };
