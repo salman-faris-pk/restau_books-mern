@@ -7,6 +7,7 @@ import AddHotel from "./pages/AddHotel";
 import MyHotels from "./pages/MyHotels";
 import EditHotel from "./pages/EditHotel";
 import Search from "./pages/Search";
+import Detail from "./pages/Detail";
 
 
 
@@ -25,6 +26,11 @@ function App() {
         {
           path:"/search",
           element: <Search />
+        },
+        {
+          path:"/detail/:hotelId",
+          element:<Detail />
+
         },
 
         {
