@@ -22,6 +22,8 @@ const SignOutButton = () => {
 
     const handleClick = () => {
       mutation.mutate();
+      const keysToRemove = ["destination", "checkIn", "checkOut","adultCount","childCount"];
+      keysToRemove.forEach((key) => sessionStorage.removeItem(key));
     };
 
 
