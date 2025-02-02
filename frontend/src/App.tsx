@@ -8,7 +8,6 @@ import MyHotels from "./pages/MyHotels";
 import EditHotel from "./pages/EditHotel";
 import Search from "./pages/Search";
 import Detail from "./pages/Detail";
-import { ScrollToTop } from "./utils/ScrollToTop";
 
 
 
@@ -70,12 +69,9 @@ function App() {
   ]);
 
   return (
-    <>
     
-    <ScrollToTop />
     <RouterProvider router={router}/>
 
-    </>
   )
 }
 

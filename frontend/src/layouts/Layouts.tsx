@@ -4,6 +4,7 @@ import Hero from "../components/Hero";
 import Footer from "../components/Footer";
 import { useAppContext } from "../contexts/AppContext";
 import SearchBar from "../components/SearchBar";
+import { ScrollToTop } from "../utils/ScrollToTop";
 
 
 const MainLayout =( )=>{
@@ -22,6 +23,7 @@ const MainLayout =( )=>{
             </div>
 
             <div className="container mx-auto py-10 flex-1">
+               <ScrollToTop />
                <Outlet />
             </div>
               <Footer />
@@ -55,6 +57,7 @@ const AuthLayout =()=>{
             </div>
 
             <div className="container mx-auto py-10 flex-1">
+              <ScrollToTop />
               <Outlet />
             </div>
               <Footer />
