@@ -8,6 +8,7 @@ import MyHotels from "./pages/MyHotels";
 import EditHotel from "./pages/EditHotel";
 import Search from "./pages/Search";
 import Detail from "./pages/Detail";
+import Booking from "./pages/Booking";
 
 
 
@@ -60,7 +61,10 @@ function App() {
         {
           path:"/edit-hotel/:hotelId",
           element: <EditHotel />
-        }
+        },{
+          path:"/hotel/:hotelId/booking",
+          element: <Booking />
+        },
         
       ]
     },

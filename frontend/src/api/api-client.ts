@@ -1,4 +1,4 @@
-import { HotelSearchResponse, HotelType } from "../../../backend/src/types/types";
+import { HotelSearchResponse, HotelType, UserType } from "../../../backend/src/types/types";
 import { RegisterFormData } from "../pages/Register"
 import { SignInFormData } from "../pages/SignIn";
 import axiosInstance from "./api-instance";
@@ -48,6 +48,16 @@ export const SignOut= async()=>{
    if (response.status !== 200) {
     throw new Error("Error during sign out");
   };
+
+};
+
+export const fetchcurrentUser= async() : Promise<UserType> => {
+  const response = await axiosInstance.get("/user/me");
+  if (response.status !== 200) {
+    throw new Error("Error fetching user!");
+  };
+
+  return response.data;
 
 };
 
