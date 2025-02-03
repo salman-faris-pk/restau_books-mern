@@ -39,8 +39,8 @@ export const SearchContextprovider = ({children}: ChildrenProp)=>{
    const [adultCount,setAdultCount]=useState<number>(()=>  parseInt(sessionStorage.getItem("adultCount") || "1"))
    const [hotelId,setHotelId]=useState<string>(() => sessionStorage.getItem("hotelID") || "");
 
-   const saveSearchValues =(destination:string,checkIn:Date,checkOut:Date,childCount:number,adultCount:number,hotelId?:string) => {
 
+   const saveSearchValues =(destination:string,checkIn:Date,checkOut:Date,childCount:number,adultCount:number,hotelId?:string) => {
         setDestination(destination)
         setCheckIn(checkIn)
         setcheckOut(checkOut)
@@ -49,7 +49,6 @@ export const SearchContextprovider = ({children}: ChildrenProp)=>{
         if(hotelId) {
             setHotelId(hotelId)
         };
-
         sessionStorage.setItem("destination", destination);
         sessionStorage.setItem("checkIn", checkIn.toISOString());
         sessionStorage.setItem("checkOut", checkOut.toISOString());
@@ -59,7 +58,6 @@ export const SearchContextprovider = ({children}: ChildrenProp)=>{
         if (hotelId) {
           sessionStorage.setItem("hotelId", hotelId);
         };
-
    };
 
 
