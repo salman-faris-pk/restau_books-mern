@@ -1,11 +1,12 @@
 import {Response,Request} from "express"
 import Hotel from "../models/hotel";
-import { HotelSearchResponse } from "../types/types";
+import { BookingType, HotelSearchResponse } from "../types/types";
+import Stripe from "stripe"
+import mongoose from "mongoose";
 
 
 
-
-
+const stripe=new Stripe(process.env.STRIPE_API_KEY as string)
 
 
 const GetSinglHotel = async(req:Request,res:Response) => {
@@ -71,6 +72,107 @@ const Searchhotel = async (req: Request, res: Response): Promise<void> => {
    }
   };
 
+
+  const StripePaymentIntent =async(req:Request,res:Response): Promise<void> => {
+    const { numberOfNights } = req.body;
+    const hotelId = req.params.hotelId;
+
+    const hotel= await Hotel.findById(hotelId);
+    if(!hotel) {
+      res.status(400).json({ message: "Hotel not found" })
+      return;
+    };
+
+    const totalCost= hotel.pricePerNight * numberOfNights;
+
+    const paymentIntent= await stripe.paymentIntents.create({
+      amount: totalCost * 100,
+      currency: "inr",
+      metadata: {
+        hotelId,
+        userId: req.userId,
+      },
+    });
+      
+    if(!paymentIntent.client_secret) {
+      res.status(500).json({ message: "Error creating payment intent" })
+      return;
+    };
+
+    const response={
+      paymentIntent: paymentIntent.id,
+      clientSecret: paymentIntent.client_secret.toString(),
+      totalCost
+    };
+
+    res.send(response);
+
+  };
+
+
+
+
+  const BookTheHotel = async(req:Request,res:Response):Promise<void> => {
+     
+    const session= await mongoose.startSession();
+    session.startTransaction();
+
+    try {
+      const paymentIntentId = req.body.paymentIntentId;
+      const paymentIntent = await stripe.paymentIntents.retrieve(paymentIntentId as string);
+
+      if (!paymentIntent) {
+        await session.abortTransaction();
+        session.endSession();
+        res.status(400).json({ message: "payment intent not found" })
+        return;
+      };
+
+      if (paymentIntent.metadata.hotelId !== req.params.hotelId || paymentIntent.metadata.userId !== req.userId) {
+         await session.abortTransaction();
+        session.endSession();
+        res.status(400).json({ message: "payment intent mismatch" })
+        return;
+      };
+
+      if (paymentIntent.status !== "succeeded") {
+        await session.abortTransaction();
+        session.endSession();
+        res.status(400).json({message: `payment intent not succeeded. Status: ${paymentIntent.status}`})
+        return;
+      };
+
+      const newBooking:BookingType = {
+        ...req.body,
+        userId: req.userId,
+      };
+
+      const hotel = await Hotel.findOneAndUpdate(
+        { _id: req.params.hotelId },
+        {
+          $push: { bookings: newBooking },
+        },
+        { session }
+      );
+
+      if (!hotel) {
+        await session.abortTransaction();
+        session.endSession();
+        res.status(400).json({ message: "hotel not found" })
+        return;
+      };
+
+      await session.commitTransaction();
+      session.endSession();
+      res.status(200).send();
+
+      
+    } catch (error) {
+      await session.abortTransaction();
+      session.endSession();
+      res.status(500).json({ message: "something went wrong" });
+    }
+  };
 
 
 
@@ -139,4 +241,6 @@ const Searchhotel = async (req: Request, res: Response): Promise<void> => {
 export {
     Searchhotel,
     GetSinglHotel,
+    StripePaymentIntent,
+    BookTheHotel,
 }

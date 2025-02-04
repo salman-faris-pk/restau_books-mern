@@ -29,6 +29,8 @@ const Detail = () => {
     return <></>;
   };
 
+    
+
 
   return (
     <div className="space-y-6">
@@ -95,6 +97,7 @@ const Detail = () => {
         <GuestInfoForm
           pricePerNight={hotel.pricePerNight}
           hotelId={hotel._id}
+          hotelUserId={hotel.userId}
         />
       </div>
     </div>

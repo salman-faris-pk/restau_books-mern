@@ -3,12 +3,14 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { useSearchContext } from "../../contexts/Searchcontext";
 import { useAppContext } from "../../contexts/AppContext";
 import DatePicker from 'react-datepicker';
-
+import { useQuery } from "@tanstack/react-query";
+import * as apiClient from "../../api/api-client"
 
 
 type Props = {
     hotelId: string;
     pricePerNight: number;
+    hotelUserId: string;
   };
 type GuestInfoFormData = {
     checkIn: Date;
@@ -17,7 +19,7 @@ type GuestInfoFormData = {
     childCount: number;
   };
 
-const GuestInfoForm = ({ hotelId, pricePerNight }: Props) => {
+const GuestInfoForm = ({ hotelId, pricePerNight,hotelUserId }: Props) => {
 
     const search=useSearchContext()
     const navigate = useNavigate();
@@ -64,9 +66,16 @@ const GuestInfoForm = ({ hotelId, pricePerNight }: Props) => {
     maxDate.setFullYear(maxDate.getFullYear() + 1);
 
     
+      const {data:currentUser}=useQuery({
+        queryKey:["fetchCurrentUser"],
+        queryFn: () => apiClient.fetchcurrentUser()
+      });
+   
+      const sameUser= currentUser?._id && currentUser._id === hotelUserId;
+
   return (
     <div className="flex flex-col p-4 ml-2 bg-blue-200 rounded-sm gap-4">
-    <h3 className="text-md font-bold">₹ {pricePerNight}</h3>
+    <h3 className="text-md font-bold">₹ {pricePerNight} <span className="text-sm font-normal text-gray-600">/ night</span></h3>
     <form
       onSubmit={
         isLoggedIn ? handleSubmit(onSubmit) : handleSubmit(onSignInClick)
@@ -140,14 +149,30 @@ const GuestInfoForm = ({ hotelId, pricePerNight }: Props) => {
           )}
         </div>
         {isLoggedIn ? (
-          <button className="bg-blue-600 text-white h-full p-2 font-bold hover:bg-blue-500 text-xl">
-            Book Now
-          </button>
-        ) : (
-          <button className="bg-blue-600 text-white h-full p-2 font-bold hover:bg-blue-500 text-xl">
-            Sign in to Book
-          </button>
-        )}
+    <div className="flex flex-col items-center w-full">
+    <button
+      disabled={sameUser as boolean}
+      className={`${
+        sameUser ? "cursor-not-allowed opacity-50" : "cursor-pointer"
+      } bg-blue-600 text-white h-full p-2 font-bold hover:bg-blue-500 text-xl w-full rounded-sm`}
+      >
+      Book Now
+    </button>
+    {sameUser && (
+      <p className="text-red-500 text-xs mt-2">You cannot book your own hotel.</p>
+    )}
+  </div>
+  ) : (
+  <div className="flex flex-col items-center">
+    <button className="bg-blue-600 text-white h-full w-full rounded-sm p-2 font-bold hover:bg-blue-500 text-xl">
+      Sign in to Book
+    </button>
+    <p className="text-gray-500 text-xs mt-2">Sign in to make a booking.</p>
+  </div>
+)}
+
+
+
       </div>
     </form>
   </div>

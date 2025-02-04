@@ -43,8 +43,7 @@ export const AppContextProvider=({children}: {children: React.ReactNode})=>{
               onClose={()=> setToast(undefined)}
             />
           )}
-
-
+          
             {children}
         </AppContext.Provider>
         
