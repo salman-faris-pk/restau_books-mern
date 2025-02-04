@@ -26,8 +26,8 @@ const Booking = () => {
   },[search.checkIn,search.checkOut])
 
 
-  const {data: paymentIntentData}=useQuery({
-    queryKey:[  "createPaymentIntent"],
+  const {data: paymentIntentData }=useQuery({
+    queryKey:[  "createPaymentIntent",hotelId, numberOfNights],
     queryFn: () => apiclient.createPaymentIntent(hotelId as string,numberOfNights.toString()),
     enabled: !!hotelId && numberOfNights > 0,
   });
@@ -66,6 +66,7 @@ const Booking = () => {
         <Elements 
           stripe={stripePromise}
           options={{clientSecret: paymentIntentData.clientSecret}}
+          key={paymentIntentData.clientSecret}
         >
           <BookingForm currentUser={currentUser} paymentIntent={paymentIntentData}/>
         </Elements>

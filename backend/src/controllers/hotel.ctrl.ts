@@ -1,8 +1,9 @@
 import {Response,Request} from "express"
 import Hotel from "../models/hotel";
-import { BookingType, HotelSearchResponse } from "../types/types";
+import { BookingType, HotelSearchResponse, UserType } from "../types/types";
 import Stripe from "stripe"
 import mongoose from "mongoose";
+import User from "../models/user";
 
 
 
@@ -73,9 +74,16 @@ const Searchhotel = async (req: Request, res: Response): Promise<void> => {
   };
 
 
+
   const StripePaymentIntent =async(req:Request,res:Response): Promise<void> => {
     const { numberOfNights } = req.body;
+    
     const hotelId = req.params.hotelId;
+    const user=await User.findById(req.userId);
+    if (!user) {
+      res.status(400).json({ message: "User not found" });
+      return;
+  }
 
     const hotel= await Hotel.findById(hotelId);
     if(!hotel) {
@@ -85,13 +93,36 @@ const Searchhotel = async (req: Request, res: Response): Promise<void> => {
 
     const totalCost= hotel.pricePerNight * numberOfNights;
 
+    const addressline1:string="palathingal";
+    const addressline2:string="malappuram";
+    const addresscity:string="paarappanagadi";
+    const addresstate:string="kerala";
+    const addresspostcode:string="672547";
+
+
+
+
+
+
     const paymentIntent= await stripe.paymentIntents.create({
       amount: totalCost * 100,
       currency: "inr",
+      description: `Booking for ${hotel.name} - ${numberOfNights} nights`,
       metadata: {
         hotelId,
         userId: req.userId,
       },
+      shipping: { 
+        name: user.firstName + " " + user.lastName,
+        address: {
+                line1: addressline1 || "N/A",
+                line2: addressline2 || "N/A",
+                city: addresscity || "N/A",
+                state: addresstate || "N/A",
+                postal_code: addresspostcode || "N/A",
+                country: "IN",
+        },
+      }
     });
       
     if(!paymentIntent.client_secret) {
@@ -127,6 +158,7 @@ const Searchhotel = async (req: Request, res: Response): Promise<void> => {
         res.status(400).json({ message: "payment intent not found" })
         return;
       };
+    
 
       if (paymentIntent.metadata.hotelId !== req.params.hotelId || paymentIntent.metadata.userId !== req.userId) {
          await session.abortTransaction();

@@ -7,6 +7,7 @@ import { useMutation } from "@tanstack/react-query";
 import * as apiClient from "../../api/api-client"
 import { CardElement, useElements, useStripe } from "@stripe/react-stripe-js";
 import { StripeCardElement } from "@stripe/stripe-js";
+import { useState } from "react";
 
 
 
@@ -36,10 +37,12 @@ const BookingForm = ({currentUser,paymentIntent}:Props) => {
   const elements=useElements();
   const search = useSearchContext();
   const { hotelId } = useParams();
+  const [isModalOpen, setIsModalOpen] = useState(false);
+ 
 
   const { showToast }=useAppContext();
 
-  const {mutate: bookRoom, isPending}=useMutation({
+  const {mutate: bookRoom,isPending}=useMutation({
    mutationFn: apiClient.createRoomBooking,
    onSuccess: () => {
      showToast({message:"Booking Saved!", type: "SUCCESS"});
@@ -49,7 +52,7 @@ const BookingForm = ({currentUser,paymentIntent}:Props) => {
    },
   });
 
-  const { handleSubmit, register } = useForm<BookingFormData>({
+  const { handleSubmit, register} = useForm<BookingFormData>({
     defaultValues: {
       firstName: currentUser.firstName,
       lastName: currentUser.lastName,
@@ -79,14 +82,19 @@ const BookingForm = ({currentUser,paymentIntent}:Props) => {
         card: elements.getElement(CardElement) as StripeCardElement,
        },
      });
-
+     
      if (result.error) {
       showToast({ message: result.error.message || "Payment failed", type: "ERROR" });
       return;
      };
 
      if(result.paymentIntent?.status === "succeeded") {
-       bookRoom({...formData, paymentIntentId: result.paymentIntent.id})
+       bookRoom({...formData, paymentIntentId: result.paymentIntent.id});
+
+       setIsModalOpen(true);
+       setTimeout(() => {
+         setIsModalOpen(false);
+       }, 4000);
      };
 
    
@@ -94,6 +102,7 @@ const BookingForm = ({currentUser,paymentIntent}:Props) => {
   
 
   return (
+    <>
     <form
       onSubmit={handleSubmit(onSubmit)}
       className="grid grid-cols-1 gap-5 rounded-lg border border-slate-300 p-5">
@@ -154,17 +163,27 @@ const BookingForm = ({currentUser,paymentIntent}:Props) => {
 
       <div className="flex justify-end">
         <button
-          disabled={isPending}
           type="submit"
+          disabled={isPending}
           className="bg-blue-600 text-white p-3 rounded-sm font-bold hover:bg-blue-500 text-md disabled:bg-gray-500"
         >
           {isPending ? "Processing..." : "Confirm Booking"}
         </button>
       </div>
       
-
-
     </form>
+
+    {isModalOpen && (
+        <div className="fixed inset-0 flex items-center justify-center z-50">
+          <div className="fixed inset-0 bg-slate-300 opacity-50"></div>
+
+          <div className="flex items-center justify-center bg-white p-8 rounded-lg shadow-lg z-50 relative">
+            <span className="text-green-500 text-6xl">✔</span>
+            <p className="mt-4 text-xl font-semibold">Payment Successful!</p>
+          </div>
+        </div>
+      )}
+    </>
   )
 }
 
