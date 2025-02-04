@@ -1,4 +1,5 @@
-import { HotelSearchResponse, HotelType, UserType } from "../../../backend/src/types/types";
+import { HotelSearchResponse, HotelType, PaymentIntentResponse, UserType } from "../../../backend/src/types/types";
+import { BookingFormData } from "../forms/BookingForm/BookingForm";
 import { RegisterFormData } from "../pages/Register"
 import { SignInFormData } from "../pages/SignIn";
 import axiosInstance from "./api-instance";
@@ -178,4 +179,24 @@ export const fetchHotelbyId = async(hotelId:string): Promise<HotelType> => {
 
   return response.data;
 
+};
+
+
+export const createPaymentIntent = async(hotelId:string,numberOfNights:string): Promise<PaymentIntentResponse> => {
+
+     const response=await axiosInstance.post(`/hotels/${hotelId}/bookings/payment-intent`,{numberOfNights});
+
+     if(response.status !== 200){
+      throw new Error("Error fetching payment intent");
+     };
+
+     return response.data;
+};
+
+
+export const createRoomBooking = async(formData: BookingFormData)=> {
+    const response= await axiosInstance.post(`/hotels/${formData.hotelId}/bookings`,formData);
+    if(response.status !==200){
+      throw new Error("Error booking room");
+    }; 
 };
