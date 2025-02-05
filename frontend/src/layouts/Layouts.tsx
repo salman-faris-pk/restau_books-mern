@@ -15,6 +15,7 @@ const MainLayout =( )=>{
 
     return (
         <div className="flex flex-col min-h-screen">
+            <ScrollToTop />
 
            <Header />
            <Hero />
@@ -24,7 +25,6 @@ const MainLayout =( )=>{
             </div>
 
             <div className="container mx-auto py-10 flex-1">
-               <ScrollToTop />
                <Outlet />
             </div>
               <Footer />
@@ -49,7 +49,8 @@ const AuthLayout =()=>{
    
     return (
         <div className="flex flex-col min-h-screen">
-
+          <ScrollToTop />
+           
            <Header />
            <Hero />
 
@@ -58,7 +59,6 @@ const AuthLayout =()=>{
             </div>
 
             <div className="container mx-auto py-10 flex-1">
-              <ScrollToTop />
               <Outlet />
             </div>
               <Footer />
