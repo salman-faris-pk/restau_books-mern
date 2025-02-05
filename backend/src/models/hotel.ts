@@ -32,7 +32,6 @@ const bookingSchema = new mongoose.Schema<BookingType>({
     imageUrls: [
         { type: String, required: true }
       ],
-    lastUpdated: { type: Date, required: true },
     bookings: [bookingSchema],
   },{
     timestamps: true

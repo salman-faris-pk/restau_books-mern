@@ -24,7 +24,16 @@ const GetSinglHotel = async(req:Request,res:Response) => {
   }
 };
 
-
+const getLatesthotels = async(req:Request,res:Response) => {
+  try {
+    const hotels=await Hotel.find().sort({ updatedAt: -1 }).limit(8);
+    res.status(200).json(hotels);
+    
+  } catch (error) {
+    res.status(500).json({ message: "Error fetching hotels" });
+  }
+    
+};
 
 
 const Searchhotel = async (req: Request, res: Response): Promise<void> => {
@@ -98,11 +107,6 @@ const Searchhotel = async (req: Request, res: Response): Promise<void> => {
     const addresscity:string="paarappanagadi";
     const addresstate:string="kerala";
     const addresspostcode:string="672547";
-
-
-
-
-
 
     const paymentIntent= await stripe.paymentIntents.create({
       amount: totalCost * 100,
@@ -275,4 +279,5 @@ export {
     GetSinglHotel,
     StripePaymentIntent,
     BookTheHotel,
+    getLatesthotels,
 }

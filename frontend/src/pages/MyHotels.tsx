@@ -3,15 +3,12 @@ import * as apiClient from "../api/api-client"
 import { Link, useNavigate } from "react-router-dom";
 import { BsBuilding, BsMap } from "react-icons/bs";
 import { BiHotel, BiMoney, BiStar } from "react-icons/bi";
-
-
+import { MdEditNote } from "react-icons/md";
 
 
 const MyHotels = () => {
 
   const navigate=useNavigate();
-
-
 
   const {data: hotelData,isLoading}=useQuery({
     queryKey:["fetchMyHotels"],
@@ -47,9 +44,12 @@ const MyHotels = () => {
         <div key={i}
           data-testid="hotel-card"
           className="flex flex-col justify-between border border-slate-300 rounded-lg p-5 gap-5 cursor-pointer"
-          onClick={()=> navigate(`/edit-hotel/${hotel._id}`)}
         >
-          <h2 className="text-2xl font-bold">{hotel.name}</h2>
+          <div className="flex items-center justify-between">
+           <h2 className="text-2xl font-bold">{hotel.name}</h2>
+           <span className="rounded-md bg-slate-50" onClick={()=> navigate(`/edit-hotel/${hotel._id}`)}>
+              <MdEditNote size={36} className="text-gray-600 hover:scale-105"/></span>
+          </div>
           <div className="whitespace-pre-line">{hotel.description}</div>
 
           <div className="grid grid-cols-5 gap-2">

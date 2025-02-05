@@ -53,6 +53,8 @@ export const SignOut= async()=>{
 
 };
 
+
+
 export const fetchcurrentUser= async() : Promise<UserType> => {
   const response = await axiosInstance.get("/user/me");
   if (response.status !== 200) {
@@ -181,6 +183,17 @@ export const fetchHotelbyId = async(hotelId:string): Promise<HotelType> => {
   return response.data;
 
 };
+
+
+export const getLatestHotels = async():Promise<HotelType[]>=>{
+  
+  const response=await axiosInstance.get("/hotels");
+  if(response.status !== 200) {
+    throw new Error("Error fetching latest Hotels");
+  };
+
+  return response.data;
+}
 
 
 export const createPaymentIntent = async(hotelId:string,numberOfNights:string): Promise<PaymentIntentResponse> => {
