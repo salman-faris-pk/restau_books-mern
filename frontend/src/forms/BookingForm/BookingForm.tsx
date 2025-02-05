@@ -38,11 +38,11 @@ const BookingForm = ({currentUser,paymentIntent}:Props) => {
   const search = useSearchContext();
   const { hotelId } = useParams();
   const [isModalOpen, setIsModalOpen] = useState(false);
- 
+ const [loading,setLoading]=useState(false)
 
   const { showToast }=useAppContext();
 
-  const {mutate: bookRoom,isPending}=useMutation({
+  const {mutate: bookRoom}=useMutation({
    mutationFn: apiClient.createRoomBooking,
    onSuccess: () => {
      showToast({message:"Booking Saved!", type: "SUCCESS"});
@@ -68,6 +68,7 @@ const BookingForm = ({currentUser,paymentIntent}:Props) => {
   });
 
   const onSubmit = async(formData: BookingFormData)=> {
+      setLoading(true)
      if(!stripe || !elements) {
        return;
      };
@@ -90,14 +91,13 @@ const BookingForm = ({currentUser,paymentIntent}:Props) => {
 
      if(result.paymentIntent?.status === "succeeded") {
        bookRoom({...formData, paymentIntentId: result.paymentIntent.id});
-
+       setLoading(false)
        setIsModalOpen(true);
        setTimeout(() => {
          setIsModalOpen(false);
        }, 4000);
      };
 
-   
   };
   
 
@@ -164,10 +164,10 @@ const BookingForm = ({currentUser,paymentIntent}:Props) => {
       <div className="flex justify-end">
         <button
           type="submit"
-          disabled={isPending}
+          disabled={loading}
           className="bg-blue-600 text-white p-3 rounded-sm font-bold hover:bg-blue-500 text-md disabled:bg-gray-500"
         >
-          {isPending ? "Processing..." : "Confirm Booking"}
+          {loading ? "Processing..." : "Confirm Booking"}
         </button>
       </div>
       

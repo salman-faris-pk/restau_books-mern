@@ -43,8 +43,8 @@ const MyHotels = () => {
      <span className="text-gray-400"> Start adding rooms to manage your listings efficiently. Click the button above to add!</span>
     }
 
-      {hotelData && hotelData.map((hotel) => (
-        <div
+      {hotelData && hotelData.map((hotel,i) => (
+        <div key={i}
           data-testid="hotel-card"
           className="flex flex-col justify-between border border-slate-300 rounded-lg p-5 gap-5 cursor-pointer"
           onClick={()=> navigate(`/edit-hotel/${hotel._id}`)}

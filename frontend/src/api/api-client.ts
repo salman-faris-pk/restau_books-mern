@@ -1,5 +1,6 @@
 import { HotelSearchResponse, HotelType, PaymentIntentResponse, UserType } from "../../../backend/src/types/types";
 import { BookingFormData } from "../forms/BookingForm/BookingForm";
+import { Hotel } from "../pages/MyBookings";
 import { RegisterFormData } from "../pages/Register"
 import { SignInFormData } from "../pages/SignIn";
 import axiosInstance from "./api-instance";
@@ -199,4 +200,13 @@ export const createRoomBooking = async(formData: BookingFormData)=> {
     if(response.status !==200){
       throw new Error("Error booking room");
     }; 
+};
+
+
+export const fetchmyBookings = async() : Promise<Hotel[]>=>{
+  const response=await axiosInstance.get("/my-bookings");
+  if(response.status !== 200) {
+    throw new Error("Unables to fetch bookings");
+  };
+  return response.data;
 };

@@ -11,8 +11,6 @@ const SearchBar = () => {
     const search=useSearchContext()
     const navigate=useNavigate()
   
-    
-
     const [destination, setDestination] = useState<string>(search.destination);
     const [checkIn, setCheckIn] = useState<Date>(search.checkIn);
     const [checkOut, setCheckOut] = useState<Date>(search.checkOut);
@@ -28,11 +26,34 @@ const SearchBar = () => {
             checkIn,
             checkOut,
             adultCount,
-            childCount 
+            childCount,
         );
         navigate("/search")
     };
 
+    const handleClear = () => {
+      const defaultDestination = "";
+      const defaultCheckIn = new Date();
+      const defaultCheckOut = new Date();
+      const defaultAdultCount = 1;
+      const defaultChildCount = 0;
+    
+      setDestination(defaultDestination);
+      setCheckIn(defaultCheckIn);
+      setCheckOut(defaultCheckOut);
+      setAdultCount(defaultAdultCount);
+      setChildCount(defaultChildCount);
+    
+      search.saveSearchValues(
+        defaultDestination,
+        defaultCheckIn,
+        defaultCheckOut,
+        defaultAdultCount,
+        defaultChildCount
+      );
+    };
+    
+  
     const minDate = new Date();
     const maxDate = new Date();
     maxDate.setFullYear(maxDate.getFullYear() + 1);
@@ -106,10 +127,12 @@ const SearchBar = () => {
       />
     </div>
     <div className="flex gap-1">
-      <button className="w-2/3 bg-blue-600 text-white h-full p-2 font-bold text-xl hover:bg-blue-500">
+      <button className="w-2/3 bg-blue-600 text-white h-full p-2 font-bold text-xl hover:bg-blue-500" type="submit">
         Search
       </button>
-      <button className="w-1/3 bg-red-600 text-white h-full p-2 font-bold text-xl hover:bg-red-500">
+      <button className="w-1/3 bg-red-600 text-white h-full p-2 font-bold text-xl hover:bg-red-500" type="reset"
+      onClick={handleClear}
+      >
         Clear
       </button>
     </div>

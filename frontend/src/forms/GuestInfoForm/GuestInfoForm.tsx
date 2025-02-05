@@ -25,7 +25,7 @@ const GuestInfoForm = ({ hotelId, pricePerNight,hotelUserId }: Props) => {
     const navigate = useNavigate();
     const location = useLocation();
     const { isLoggedIn } = useAppContext();
-
+  
 
     const {register,watch,setValue,handleSubmit,formState: { errors }}=useForm<GuestInfoFormData>({
       defaultValues: {

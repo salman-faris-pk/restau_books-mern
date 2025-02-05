@@ -10,8 +10,8 @@ import { ScrollToTop } from "../utils/ScrollToTop";
 const MainLayout =( )=>{
 
   const location=useLocation()
-  const hiddenPaths = ["/sign-in", "/register"];
-  const isHidden = hiddenPaths.includes(location.pathname);
+  const shownPaths = ["/", "/search"];
+  const isShown = shownPaths.includes(location.pathname);
 
     return (
         <div className="flex flex-col min-h-screen">
@@ -19,7 +19,7 @@ const MainLayout =( )=>{
            <Header />
            <Hero />
 
-           <div className={`${isHidden ? "hidden" : "block"} container mx-auto`}>
+           <div className={`${isShown ? "block" : "hidden"} container mx-auto`}>
              <SearchBar />
             </div>
 
@@ -40,8 +40,8 @@ const AuthLayout =()=>{
   const location=useLocation()
 
   const { isLoggedIn } = useAppContext();
-  const hiddenPaths = ["/sign-in", "/register"];
-  const isHidden = hiddenPaths.includes(location.pathname);
+  const shownPaths = ["/", "/search"];
+  const isShown = shownPaths.includes(location.pathname);
 
    if(!isLoggedIn) return <Navigate to={"/sign-in"} state={{ from: location }}/>
 
@@ -53,7 +53,7 @@ const AuthLayout =()=>{
            <Header />
            <Hero />
 
-            <div className={`${isHidden ? "hidden" : "block"} container mx-auto`}>
+            <div className={`${isShown ? "block" : "hidden"} container mx-auto`}>
              <SearchBar />
             </div>
 

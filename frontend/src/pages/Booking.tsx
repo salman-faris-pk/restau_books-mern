@@ -26,7 +26,7 @@ const Booking = () => {
   },[search.checkIn,search.checkOut])
 
 
-  const {data: paymentIntentData }=useQuery({
+  const {data: paymentIntentData,isLoading}=useQuery({
     queryKey:[  "createPaymentIntent",hotelId, numberOfNights],
     queryFn: () => apiclient.createPaymentIntent(hotelId as string,numberOfNights.toString()),
     enabled: !!hotelId && numberOfNights > 0,
@@ -48,6 +48,13 @@ const Booking = () => {
 
   if (!hotel) {
     return <></>;
+  };
+  if (isLoading) {
+    return (
+    <div className="flex justify-center items-center">
+     <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-blue-500"></div>
+     </div>
+    )
   };
 
 
