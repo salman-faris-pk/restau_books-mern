@@ -1,95 +1,5 @@
-// import { createBrowserRouter, RouterProvider } from "react-router-dom"
-// import { MainLayout ,AuthLayout } from "./layouts/Layouts"
-// import Homepage from "./pages/Homepage";
-// import Register from "./pages/Register";
-// import SignIn from "./pages/SignIn";
-// import AddHotel from "./pages/AddHotel";
-// import MyHotels from "./pages/MyHotels";
-// import EditHotel from "./pages/EditHotel";
-// import Search from "./pages/Search";
-// import Detail from "./pages/Detail";
-// import Booking from "./pages/Booking";
-// import MyBookings from "./pages/MyBookings";
-
-
-
-// function App() {
-
-//   const router=createBrowserRouter([
-
-//     {
-//       path:"/",
-//       element: <MainLayout />,
-//       children: [
-//         {
-//           path:"/",
-//           element: <Homepage/>
-//         },
-//         {
-//           path:"/search",
-//           element: <Search />
-//         },
-//         {
-//           path:"/detail/:hotelId",
-//           element:<Detail />
-
-//         },
-
-//         {
-//           path:"/register",
-//           element: <Register />
-//         },
-//         {
-//           path:"/sign-in",
-//           element: <SignIn />
-//         },
-
-//       ]
-//     },
-
-//     {
-//       path:"/",
-//       element: <AuthLayout />,
-//       children:[
-//         {
-//           path:"/add-hotel",
-//           element: <AddHotel />
-//         },
-//         {
-//           path:"/my-hotels",
-//           element: <MyHotels />
-//         },
-//         {
-//           path:"/edit-hotel/:hotelId",
-//           element: <EditHotel />
-//         },
-//         {
-//           path:"/hotel/:hotelId/booking",
-//           element: <Booking />
-//         },
-//         {
-//           path:"/my-bookings",
-//           element: <MyBookings />
-//         },
-        
-//       ]
-//     },
-
-
-//   ]);
-
-//   return (
-    
-//     <RouterProvider router={router}/>
-
-//   )
-// }
-
-// export default App
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import { Suspense, lazy } from "react";
-
-// Lazy load your components
 import {AuthLayout,MainLayout} from "./layouts/Layouts"
 const Homepage = lazy(() => import("./pages/Homepage"));
 const Register = lazy(() => import("./pages/Register"));
@@ -107,7 +17,7 @@ function App() {
     {
       path: "/",
       element: (
-        <Suspense fallback={<div>Loading...</div>}>
+        <Suspense fallback={<div className="text-gray-400">Loading...</div>}>
           <MainLayout />
         </Suspense>
       ),
@@ -115,7 +25,7 @@ function App() {
         {
           path: "/",
           element: (
-            <Suspense fallback={<div>Loading...</div>}>
+            <Suspense fallback={<div className="text-gray-200">Loading...</div>}>
               <Homepage />
             </Suspense>
           ),
@@ -123,7 +33,7 @@ function App() {
         {
           path: "/search",
           element: (
-            <Suspense fallback={<div>Loading...</div>}
+            <Suspense fallback={<div className="text-gray-400">Loading...</div>}
             >
               <Search />
             </Suspense>
@@ -132,7 +42,7 @@ function App() {
         {
           path: "/detail/:hotelId",
           element: (
-            <Suspense fallback={<div>Loading...</div>}>
+            <Suspense fallback={<div className="text-gray-400">Loading...</div>}>
               <Detail />
             </Suspense>
           ),
@@ -140,7 +50,7 @@ function App() {
         {
           path: "/register",
           element: (
-            <Suspense fallback={<div>Loading...</div>}>
+            <Suspense fallback={<div className="text-gray-400">Loading...</div>}>
               <Register />
             </Suspense>
           ),
@@ -158,7 +68,7 @@ function App() {
     {
       path: "/auth",
       element: (
-        <Suspense fallback={<div>Loading...</div>}>
+        <Suspense fallback={<div className="text-gray-400">Loading...</div>}>
           <AuthLayout />
         </Suspense>
       ),
@@ -166,7 +76,7 @@ function App() {
         {
           path: "/auth/add-hotel",
           element: (
-            <Suspense fallback={<div>Loading...</div>}>
+            <Suspense fallback={<div className="text-gray-400">Loading...</div>}>
               <AddHotel />
             </Suspense>
           ),
@@ -174,7 +84,7 @@ function App() {
         {
           path: "/auth/my-hotels",
           element: (
-            <Suspense fallback={<div>Loading...</div>}>
+            <Suspense fallback={<div className="text-gray-400">Loading...</div>}>
               <MyHotels />
             </Suspense>
           ),
@@ -182,7 +92,7 @@ function App() {
         {
           path: "/auth/edit-hotel/:hotelId",
           element: (
-            <Suspense fallback={<div>Loading...</div>}>
+            <Suspense fallback={<div className="text-gray-400">Loading...</div>}>
               <EditHotel />
             </Suspense>
           ),
@@ -190,7 +100,7 @@ function App() {
         {
           path: "/auth/hotel/:hotelId/booking",
           element: (
-            <Suspense fallback={<div>Loading...</div>}>
+            <Suspense fallback={<div className="text-gray-400">Loading...</div>}>
               <Booking />
             </Suspense>
           ),
@@ -198,7 +108,7 @@ function App() {
         {
           path: "/auth/my-bookings",
           element: (
-            <Suspense fallback={<div>Loading...</div>}>
+            <Suspense fallback={<div className="text-gray-400">Loading...</div>}>
               <MyBookings />
             </Suspense>
           ),
