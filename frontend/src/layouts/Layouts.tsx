@@ -5,6 +5,7 @@ import Footer from "../components/Footer";
 import { useAppContext } from "../contexts/AppContext";
 import SearchBar from "../components/SearchBar";
 import { ScrollToTop } from "../utils/ScrollToTop";
+import MobNav from "../components/MobNav";
 
 
 
@@ -18,7 +19,7 @@ const MainLayout =( )=>{
     return (
         <div className="flex flex-col min-h-screen">
             <ScrollToTop />
-
+            <MobNav/>
            <Header />
            <Hero />
 
@@ -31,7 +32,6 @@ const MainLayout =( )=>{
             </div>
 
               <Footer />
-            
         </div>
     )
 }
@@ -53,7 +53,7 @@ const AuthLayout =()=>{
     return (
         <div className="flex flex-col min-h-screen">
           <ScrollToTop />
-           
+
            <Header />
         
            <Hero />
@@ -67,6 +67,9 @@ const AuthLayout =()=>{
             </div>
                
               <Footer />
+
+          <MobNav/>
+
         </div>
     )
 };

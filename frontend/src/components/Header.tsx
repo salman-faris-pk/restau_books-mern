@@ -1,7 +1,6 @@
 import { Link } from "react-router-dom";
 import SignOutButton from "./SignOutButton";
 import { useAppContext } from "../contexts/AppContext";
-import MobNav from "./MobNav";
 
 
 const Header = () => {
@@ -45,10 +44,7 @@ const Header = () => {
 
         </span>
      </div>
-         
-         {isLoggedIn && (
-           <MobNav/>
-         )}
+        
 
     </div>
   )

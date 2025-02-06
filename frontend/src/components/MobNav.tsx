@@ -9,8 +9,10 @@ import { FaUser } from "react-icons/fa";
 
 
 const MobNav = () => {
+
+
   return (
-    <div className="fixed bottom-0 w-full h-16 py-2 bg-white flex items-center justify-around z-40 md:hidden rounded-t-md shadow-lg"   style={{ transform: 'translateZ(0)' }}>
+    <div className="fixed bottom-0 left-0 w-full h-16 py-2 bg-white flex items-center justify-around z-40 md:hidden rounded-t-md shadow-lg border-t">
       <Link to="/" className="flex flex-col items-center gap-1">
         <FaHome className="text-lg text-gray-700" />
         <span className="text-xs text-gray-700">Home</span>
