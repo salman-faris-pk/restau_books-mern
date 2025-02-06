@@ -39,7 +39,7 @@ const SearchResultsCard = ({ hotel}: Props) => {
       </div>
 
       <div>
-        <div className="line-clamp-5 font-thin text-sm text-slate-800">{hotel.description}</div>
+        <div className="line-clamp-5 text-sm">{hotel.description}</div>
       </div>
 
       <div className="grid grid-cols-2 items-end whitespace-nowrap">
