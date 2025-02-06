@@ -66,7 +66,7 @@ function App() {
       ],
     },
     {
-      path: "/auth",
+      path: "/",
       element: (
         <Suspense fallback={<div className="text-gray-400">Loading...</div>}>
           <AuthLayout />
@@ -74,7 +74,7 @@ function App() {
       ),
       children: [
         {
-          path: "/auth/add-hotel",
+          path: "/add-hotel",
           element: (
             <Suspense fallback={<div className="text-gray-400">Loading...</div>}>
               <AddHotel />
@@ -82,7 +82,7 @@ function App() {
           ),
         },
         {
-          path: "/auth/my-hotels",
+          path: "/my-hotels",
           element: (
             <Suspense fallback={<div className="text-gray-400">Loading...</div>}>
               <MyHotels />
@@ -90,7 +90,7 @@ function App() {
           ),
         },
         {
-          path: "/auth/edit-hotel/:hotelId",
+          path: "/edit-hotel/:hotelId",
           element: (
             <Suspense fallback={<div className="text-gray-400">Loading...</div>}>
               <EditHotel />
@@ -98,7 +98,7 @@ function App() {
           ),
         },
         {
-          path: "/auth/hotel/:hotelId/booking",
+          path: "/hotel/:hotelId/booking",
           element: (
             <Suspense fallback={<div className="text-gray-400">Loading...</div>}>
               <Booking />
@@ -106,7 +106,7 @@ function App() {
           ),
         },
         {
-          path: "/auth/my-bookings",
+          path: "/my-bookings",
           element: (
             <Suspense fallback={<div className="text-gray-400">Loading...</div>}>
               <MyBookings />

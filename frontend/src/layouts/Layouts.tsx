@@ -7,6 +7,8 @@ import SearchBar from "../components/SearchBar";
 import { ScrollToTop } from "../utils/ScrollToTop";
 
 
+
+
 const MainLayout =( )=>{
 
   const location=useLocation()
@@ -27,6 +29,7 @@ const MainLayout =( )=>{
             <div className="container mx-auto py-10 flex-1">
                <Outlet />
             </div>
+
               <Footer />
             
         </div>
@@ -52,6 +55,7 @@ const AuthLayout =()=>{
           <ScrollToTop />
            
            <Header />
+        
            <Hero />
 
             <div className={`${isShown ? "block" : "hidden"} container mx-auto`}>
@@ -61,8 +65,8 @@ const AuthLayout =()=>{
             <div className="container mx-auto py-10 flex-1">
               <Outlet />
             </div>
+               
               <Footer />
-            
         </div>
     )
 };

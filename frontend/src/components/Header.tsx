@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import SignOutButton from "./SignOutButton";
 import { useAppContext } from "../contexts/AppContext";
+import MobNav from "./MobNav";
 
 
 const Header = () => {
@@ -18,13 +19,13 @@ const Header = () => {
         {isLoggedIn ? (
             <>
               <Link
-                className="flex items-center text-white px-3 font-bold hover:bg-blue-600 hover:rounded-sm"
+                className="hidden md:flex items-center text-white px-3 font-bold hover:bg-blue-600 hover:rounded-sm"
                 to="/my-bookings"
               >
                 My Bookings
               </Link>
               <Link
-                className="flex items-center text-white px-3 font-bold hover:bg-blue-600 hover:rounded-sm"
+                className="hidden md:flex items-center text-white px-3 font-bold hover:bg-blue-600 hover:rounded-sm"
                 to="/my-hotels"
               >
                 My Hotels
@@ -43,8 +44,11 @@ const Header = () => {
           )}
 
         </span>
-
-        </div>
+     </div>
+         
+         {isLoggedIn && (
+           <MobNav/>
+         )}
 
     </div>
   )
