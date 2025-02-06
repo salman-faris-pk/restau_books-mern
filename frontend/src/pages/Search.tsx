@@ -94,11 +94,11 @@ const Search = () => {
   
   
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-[250px_1fr] gap-5">
+    <div className="grid grid-cols-1 lg:grid-cols-[250px_1fr] gap-5 px-2 md:px-0">
 
-      <div className="rounded-lg border border-slate-300 p-5 h-fit md:sticky md:top-10">
+      <div className="rounded-lg border border-slate-300 p-5 h-fit lg:sticky lg:top-10">
 
-         <h3 className="md:hidden  text-xl flex items-center cursor-pointer gap-2 pb-5" onClick={()=> SetShowfilter(!showfilter)}>
+         <h3 className="md:hidden text-xl flex items-center cursor-pointer gap-2 pb-5" onClick={()=> SetShowfilter(!showfilter)}>
             FILTERS <MdArrowForwardIos size={16} className={`text-gray-300 ${showfilter ? "rotate-90" : ""}`}/>
           </h3>
          <h3 className="hidden md:block text-lg font-semibold border-b border-slate-300 pb-5">
@@ -127,7 +127,7 @@ const Search = () => {
       
       <div className="flex flex-col gap-5">
         <div className="flex justify-between items-center">
-          <span className="text-xl font-bold">
+          <span className="text-md md:text-xl font-bold">
             {hotelData?.pagination?.total} Hotels found
             {search.destination ? ` in ${search.destination}` : ""}
           </span>
@@ -160,6 +160,8 @@ const Search = () => {
         </div>
       </div>
     </div>   
+
+
     
   )
 }

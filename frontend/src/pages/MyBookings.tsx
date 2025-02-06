@@ -40,14 +40,14 @@ const MyBookings = () => {
         <span className="text-gray-500 font-semibold">No bookings found. Start planning your next stay today!😊</span>
      ): (
         
-      <div className="space-y-5">
-      <h1 className="text-3xl font-bold">My Bookings</h1>
+      <div className="space-y-5 px-2 md:px-0">
+      <h1 className="text-2xl md:text-3xl font-bold">My Bookings</h1>
       {hotels.map((hotel) => (
-        <div className="grid grid-cols-1 lg:grid-cols-[1fr_3fr] border border-slate-300 rounded-lg p-8 gap-5" key={hotel._id}>
-          <div className="lg:w-full lg:h-[250px]">
+        <div className="grid grid-cols-1 lg:grid-cols-[1fr_3fr] border border-slate-300 rounded-lg p-3 md:p-5 gap-5" key={hotel._id}>
+          <div className="lg:w-full lg:h-[250px] rounded-md">
             <img
               src={hotel.imageUrls[0]}
-              className="w-full h-full object-cover object-center"
+              className="w-full h-full object-cover object-center rounded-md"
             />
           </div>
           <div className="flex flex-col gap-4 overflow-y-auto max-h-[260px]">

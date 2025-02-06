@@ -17,11 +17,11 @@ const Homepage = () => {
 
   return (
     <div className="space-y-3">
-       <div className="flex items-center justify-between">
-        <h2 className="text-3xl font-bold">Latest Destinations</h2>
+       <div className="flex items-center justify-between px-2 md:px-0">
+        <h2 className="text-2xl md:text-3xl font-bold">Latest Destinations</h2>
         <span className="cursor-pointer border-2 bg-slate-100 p-1 rounded-full hover:scale-105" onClick={()=> refetch()}><FcRefresh size={22} className={`${isFetching ? "text-blue-300" : ""}`}/></span>
         </div>
-       <p>Most recent desinations added by our hosts</p>
+       <p className="px-2 md:px-0">Most recent desinations added by our hosts</p>
 
     {isLoading ? (
         <div className="flex justify-center items-center">
@@ -29,14 +29,14 @@ const Homepage = () => {
         </div>
       ): (
       <div className="grid gap-4">
-      <div className="grid md:grid-cols-2 grid-cols-1 gap-4">
+      <div className="grid md:grid-cols-2 grid-cols-1 gap-4 px-2 md:px-0">
         {topRowHotels.map((hotel) => (
-          <LatestDestinationCard hotel={hotel} />
+          <LatestDestinationCard hotel={hotel} key={hotel._id}/>
         ))}
       </div>
-      <div className="grid md:grid-cols-3 gap-4">
-        {bottomRowHotels.map((hotel) => (
-          <LatestDestinationCard hotel={hotel} />
+      <div className="grid md:grid-cols-3 gap-4 px-2 md:px-0">
+        {bottomRowHotels.map((hotel,i) => (
+          <LatestDestinationCard hotel={hotel} key={i}/>
         ))}
       </div>
     </div>

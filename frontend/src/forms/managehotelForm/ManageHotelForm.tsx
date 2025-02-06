@@ -27,14 +27,14 @@ export type HotelFormData = {
 
 
 interface Props{
- hotel?: HotelType;
+ hotel?: HotelType;  
  onSave: (hotelFormData: FormData)=> void;
  isLoading: boolean;
  setResetform: (resetFunc: () => void) => void;
 };
 
 
-const ManageHotelForm = ({ onSave, isLoading, hotel,setResetform}: Props) => {
+const ManageHotelForm = ({ onSave, isLoading, hotel,setResetform}: Props) => {  //here hotel is optional
 
   const formMethods= useForm<HotelFormData>()
   const { handleSubmit, reset }=formMethods;
@@ -88,7 +88,7 @@ const onSubmit = handleSubmit((formDataJson: HotelFormData) => {
 
   return (
     <FormProvider {...formMethods}>
-        <form className="flex flex-col gap-10" onSubmit={onSubmit}>
+        <form className="flex flex-col gap-10 px-2 md:px-0" onSubmit={onSubmit}>
          <DetailsSection />
          <TypeSection />
          <FacilitiesSection />

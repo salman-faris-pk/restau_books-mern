@@ -62,7 +62,7 @@ const SearchBar = () => {
   return (
     <form
     onSubmit={handleSubmit}
-    className="-mt-8 p-3 bg-orange-400 rounded shadow-md grid grid-cols-2 lg:grid-cols-3 2xl:grid-cols-5 items-center gap-4"
+    className="-mt-8 p-2 md:p-3 bg-orange-400 rounded shadow-md grid grid-cols-2 lg:grid-cols-3 2xl:grid-cols-5 items-center gap-4"
     >
     <div className="flex flex-row items-center flex-1 bg-white p-2">
       <MdTravelExplore size={25} className="mr-2" />
@@ -108,8 +108,8 @@ const SearchBar = () => {
         minDate={minDate}
         maxDate={maxDate}
         placeholderText="Check-in Date"
-        className="min-w-full bg-white p-2 focus:outline-none"
-        wrapperClassName="min-w-full"
+        className="w-full md:min-w-full bg-white p-2 focus:outline-none"
+        wrapperClassName="w-full md:min-w-full"
       />
     </div>
     <div>
@@ -122,8 +122,8 @@ const SearchBar = () => {
         minDate={minDate}
         maxDate={maxDate}
         placeholderText="Check-out Date"
-        className="min-w-full bg-white p-2 focus:outline-none"
-        wrapperClassName="min-w-full"
+        className="w-full md:min-w-full bg-white p-2 focus:outline-none"
+        wrapperClassName="w-full md:min-w-full"
       />
     </div>
     <div className="flex gap-1">

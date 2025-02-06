@@ -1,7 +1,7 @@
 import { useForm } from "react-hook-form";
 import { PaymentIntentResponse, UserType } from "../../../../backend/src/types/types"
 import { useSearchContext } from "../../contexts/Searchcontext";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { useAppContext } from "../../contexts/AppContext";
 import { useMutation } from "@tanstack/react-query";
 import * as apiClient from "../../api/api-client"
@@ -39,6 +39,7 @@ const BookingForm = ({currentUser,paymentIntent}:Props) => {
   const { hotelId } = useParams();
   const [isModalOpen, setIsModalOpen] = useState(false);
  const [loading,setLoading]=useState(false)
+ const navigate=useNavigate()
 
   const { showToast }=useAppContext();
 
@@ -95,6 +96,7 @@ const BookingForm = ({currentUser,paymentIntent}:Props) => {
        setIsModalOpen(true);
        setTimeout(() => {
          setIsModalOpen(false);
+         navigate("/my-bookings")
        }, 4000);
      };
 

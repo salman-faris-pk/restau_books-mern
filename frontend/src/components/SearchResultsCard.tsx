@@ -13,7 +13,7 @@ const SearchResultsCard = ({ hotel}: Props) => {
 
   return (
 
-    <div className="grid grid-cols-1 xl:grid-cols-[2fr_3fr] border border-slate-300 rounded-lg p-8 gap-8">
+    <div className="grid grid-cols-1 xl:grid-cols-[2fr_3fr] border border-slate-300 rounded-lg p-3 md:p-5 gap-4 md:gap-8">
     <div className="w-full h-[300px]">
       <img
         src={hotel.imageUrls[0]}
@@ -39,26 +39,26 @@ const SearchResultsCard = ({ hotel}: Props) => {
       </div>
 
       <div>
-        <div className="line-clamp-4">{hotel.description}</div>
+        <div className="line-clamp-5 font-thin text-sm text-slate-800">{hotel.description}</div>
       </div>
 
       <div className="grid grid-cols-2 items-end whitespace-nowrap">
         <div className="flex gap-1 items-center">
           {hotel.facilities.slice(0, 3).map((facility,i) => (
-            <span className="bg-slate-300 p-2 rounded-lg font-bold text-xs whitespace-nowrap" key={i}>
+            <span className="bg-slate-300 p-1 md:p-2 rounded-lg font-bold text-xs whitespace-nowrap" key={i}>
               {facility}
             </span>
           ))}
-          <span className="text-sm">
+          <span className="text-[10px] md:text-sm">
             {hotel.facilities.length > 3 &&
               `+${hotel.facilities.length - 3} more`}
           </span>
         </div>
-        <div className="flex flex-col items-end gap-1">
-          <span className="font-bold">₹{hotel.pricePerNight} per night</span>
+        <div className="flex flex-col items-end gap-y-1">
+          <span className="font-semibold md:font-bold">₹{hotel.pricePerNight} per night</span>
           <Link
             to={`/detail/${hotel._id}`}
-            className="bg-blue-600 text-white h-full p-2 font-bold text-xl max-w-fit hover:bg-blue-500"
+            className="bg-blue-600 text-white h-full p-2 font-bold text-md md:text-xl max-w-fit hover:bg-blue-500"
           >
             View More
           </Link>

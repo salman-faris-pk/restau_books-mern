@@ -17,7 +17,7 @@ const TypeSection = () => {
     <div>
     <h2 className="text-2xl font-bold mb-3">Type</h2>
 
-    <div className="grid grid-cols-5 gap-2">
+    <div className="grid grid-cols-3 md:grid-cols-5 gap-2">
       {hotelTypes.map((type,i) => (
         <label key={i}
           className={
