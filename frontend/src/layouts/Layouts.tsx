@@ -6,6 +6,7 @@ import { useAppContext } from "../contexts/AppContext";
 import SearchBar from "../components/SearchBar";
 import { ScrollToTop } from "../utils/ScrollToTop";
 import MobNav from "../components/MobNav";
+import UpArrow from "../components/UpArrow";
 
 
 
@@ -30,7 +31,7 @@ const MainLayout =( )=>{
             <div className="container mx-auto py-10 flex-1">
                <Outlet />
             </div>
-
+               <UpArrow/>
               <Footer />
         </div>
     )
@@ -67,7 +68,9 @@ const AuthLayout =()=>{
             </div>
                
               <Footer />
-
+              
+              <UpArrow/>
+           
           <MobNav/>
 
         </div>
