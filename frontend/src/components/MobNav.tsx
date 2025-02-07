@@ -35,7 +35,7 @@ const MobNav = () => {
         <span className="text-xs text-gray-700">Account</span>
       </Link>
 
-      <Link to="/settings" className="flex flex-col items-center gap-1">
+      <Link to="#" className="flex flex-col items-center gap-1">
         <GiHamburgerMenu className="text-lg  text-gray-700"/>
         <span className="text-xs text-gray-700">Menu</span>
       </Link>

@@ -29,6 +29,12 @@ const Header = () => {
               >
                 My Hotels
               </Link>
+              <Link
+                className="hidden md:flex items-center text-white px-3 font-bold hover:bg-blue-600 hover:rounded-sm"
+                to="/profile"
+              >
+                Profile
+              </Link>
 
               <SignOutButton />
               

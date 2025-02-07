@@ -1,5 +1,5 @@
 import express, {Request,Response} from "express"
-import {Login, Register,getMe} from "../controllers/user.cotrls"
+import {Login, Register,getMe,Profile} from "../controllers/user.cotrls"
 import { check } from "express-validator"
 import { validateRequest } from "../middlewares/validateMiddleware"
 import verifyToken from "../middlewares/auth"
@@ -41,6 +41,7 @@ router.post("/logout", (req:Request,res:Response)=>{
     res.send();
 });
 
+router.get("/profile",verifyToken,Profile);
 
 
 

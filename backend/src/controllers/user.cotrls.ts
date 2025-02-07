@@ -2,6 +2,7 @@ import { Request, Response} from "express";
 import User from "../models/user"
 import jwt from "jsonwebtoken";
 import bcrypt from "bcryptjs"
+import Hotel from "../models/hotel";
 
 
 
@@ -99,6 +100,44 @@ const getMe=async(req:Request, res:Response) : Promise<void> => {
 };
 
 
+const Profile=async(req:Request,res:Response): Promise<void>=> {
+
+  const userId=req.userId;
+
+  try {
+    const user= await User.findById(userId).select("-password");
+
+    if (!user) {
+      res.status(404).json({ message: "User not found" });
+      return;
+    };
+
+    
+    const myHotels = await Hotel.find({ userId }).lean();
+
+    const bookingCount = await Hotel.aggregate([
+      { $unwind: "$bookings" }, 
+      { $match: { "bookings.userId": userId } },
+      { $count: "totalBookings" } //here just names as totolBookings not a field
+    ]);
+    
+    const bookingsCount=bookingCount.length > 0 ? bookingCount[0].totalBookings : 0;
+
+    res.status(200).json({
+      firstname:user.firstName,
+      lastname: user.lastName,
+      email: user.email,
+      productCount: myHotels.length,
+      bookingsCount
+    });
+
+     
+  } catch (error) {
+    res.status(500).json({ message: "something went wrong" });
+  }
+};
+
+
 
 
 
@@ -107,4 +146,5 @@ export {
     Register,
     Login,
     getMe,
+    Profile
 }

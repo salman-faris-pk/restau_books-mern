@@ -1,6 +1,7 @@
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import { Suspense, lazy } from "react";
 import {AuthLayout,MainLayout} from "./layouts/Layouts"
+import Profile from "./pages/Profile";
 const Homepage = lazy(() => import("./pages/Homepage"));
 const Register = lazy(() => import("./pages/Register"));
 const SignIn = lazy(() => import("./pages/SignIn"));
@@ -110,6 +111,14 @@ function App() {
           element: (
             <Suspense fallback={<div className="text-gray-400">Loading...</div>}>
               <MyBookings />
+            </Suspense>
+          ),
+        },
+        {
+          path: "/profile",
+          element: (
+            <Suspense fallback={<div className="text-gray-400">Loading...</div>}>
+              <Profile />
             </Suspense>
           ),
         },

@@ -1,6 +1,7 @@
 import { HotelSearchResponse, HotelType, PaymentIntentResponse, UserType } from "../../../backend/src/types/types";
 import { BookingFormData } from "../forms/BookingForm/BookingForm";
 import { Hotel } from "../pages/MyBookings";
+import { UserProfileResponse } from "../pages/Profile";
 import { RegisterFormData } from "../pages/Register"
 import { SignInFormData } from "../pages/SignIn";
 import axiosInstance from "./api-instance";
@@ -77,6 +78,15 @@ export const addMyHotel =async(hotelFormdata: FormData) => {
 
   return response.data;
 
+};
+
+
+export const userProfile = async(): Promise<UserProfileResponse>=> {
+  const response=await axiosInstance.get("/user/profile");
+  if(response.status !==200){
+    throw new Error("error fetching user profile datas..");
+  };
+  return response.data;
 };
 
 
