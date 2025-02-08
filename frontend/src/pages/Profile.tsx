@@ -53,7 +53,6 @@ const Profile = () => {
     mutationFn: (hotelId: string) => apiClient.removeWishlist(hotelId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["wishlist"] });
-      queryClient.invalidateQueries({queryKey:["fetchStatus"]});
       showToast({ message: "Removed from wishlist!", type: "SUCCESS" });
     },
     onError: () => {

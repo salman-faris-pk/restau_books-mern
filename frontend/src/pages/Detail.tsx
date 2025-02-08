@@ -17,7 +17,7 @@ const Detail = () => {
   const { showToast,isLoggedIn}=useAppContext()
 
 
-  const {data: CurrentStatus}=useQuery({
+  const {data: CurrentStatus,isLoading}=useQuery({
     queryKey:["fetchStatus",hotelId],
     queryFn: ()=> apiClient.WishListStatus(hotelId as string),
     enabled: !!hotelId,
@@ -70,10 +70,19 @@ const Detail = () => {
       </span>
       <div className="flex justify-between cursor-pointer">
        <h1 className="text-3xl font-bold">{hotel.name}</h1>
-       {isLoggedIn && 
-       <span>{CurrentStatus?.inWishlist === true ? <MdBookmarkAdded size={40} onClick={()=> removeFromWishlist()}/> 
-                                                  : <CiBookmark size={40} onClick={()=> addToWishlist()}/>}</span>
-       }
+       {isLoggedIn ? (
+         isLoading ? (
+        <p>...</p>
+       ) : (
+        <span>
+      {CurrentStatus?.inWishlist ? (
+        <MdBookmarkAdded size={40} onClick={()=> removeFromWishlist()} />
+      ) : (
+        <CiBookmark size={40} onClick={()=> addToWishlist()} />
+      )}
+      </span>
+     )
+    ) : null}
       </div>
     </div>
 
