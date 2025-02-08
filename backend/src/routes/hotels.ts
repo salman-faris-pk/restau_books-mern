@@ -1,5 +1,5 @@
 import express from "express";
-import { Searchhotel,GetSinglHotel,StripePaymentIntent,BookTheHotel,getLatesthotels,AddToWishlist,isHotelInWishlist,removeFromWishlist} from "../controllers/hotel.ctrl"
+import { Searchhotel,GetSinglHotel,StripePaymentIntent,fetchAllWishlistByUser,BookTheHotel,getLatesthotels,AddToWishlist,isHotelInWishlist,removeFromWishlist} from "../controllers/hotel.ctrl"
 import { param } from "express-validator";
 import { validateRequest } from "../middlewares/validateMiddleware";
 import verifyToken from "../middlewares/auth";
@@ -10,6 +10,7 @@ const router = express.Router();
 
 router.get("/",getLatesthotels)
 router.get("/search",Searchhotel)
+router.get("/wishlist",verifyToken,fetchAllWishlistByUser)
 router.post("/wishlist/:hotelId",verifyToken,AddToWishlist)
 router.get("/wishlist/:hotelId",verifyToken,isHotelInWishlist)
 router.delete("/wishlist/:hotelId",verifyToken,removeFromWishlist)

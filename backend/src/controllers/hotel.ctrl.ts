@@ -330,8 +330,22 @@ try {
 }
 };
 
-const fetchAllWishlistByUser =async(req:Request,res:Response)=>{
+const fetchAllWishlistByUser = async(req:Request,res:Response)=>{
+    const userId=req.userId;
+ try {
 
+  const wishlist=await Wishlist.find({ userId })
+     .populate({
+      path:"hotelId",
+        select: "_id name starRating type imageUrls",
+     })
+     .sort({ updatedAt: -1 });
+
+  res.status(200).json(wishlist);
+  
+ } catch (error) {
+  res.status(500).json({ message: "Something went wrong" });
+ }
 
 };
 
@@ -346,4 +360,5 @@ export {
     isHotelInWishlist,
     AddToWishlist,
     removeFromWishlist,
+    fetchAllWishlistByUser
 }

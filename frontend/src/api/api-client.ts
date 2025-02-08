@@ -1,7 +1,7 @@
 import { HotelSearchResponse, HotelType, PaymentIntentResponse, UserType } from "../../../backend/src/types/types";
 import { BookingFormData } from "../forms/BookingForm/BookingForm";
 import { Hotel } from "../pages/MyBookings";
-import { UserProfileResponse } from "../pages/Profile";
+import { UserProfileResponse, WishlistItem } from "../pages/Profile";
 import { RegisterFormData } from "../pages/Register"
 import { SignInFormData } from "../pages/SignIn";
 import axiosInstance from "./api-instance";
@@ -267,4 +267,17 @@ export const removeWishlist = async(hotelId:string)=>{
   return response.data;
 
 };
+
+
+export const Wishlist = async() :Promise<WishlistItem[]> =>{
+  const response=await axiosInstance.get("/hotels/wishlist");
+   
+  if(response.status !== 200){
+    throw new Error("error fetching wishlist");
+  };
+
+  return response.data;
+
+};
+
 
