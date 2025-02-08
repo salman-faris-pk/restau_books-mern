@@ -4,6 +4,7 @@ import { AiFillStar } from "react-icons/ai";
 
 
 
+
 type Props = {
     hotel: HotelType;
   };
@@ -11,6 +12,7 @@ type Props = {
 
 const SearchResultsCard = ({ hotel}: Props) => {
 
+ 
   return (
 
     <div className="grid grid-cols-1 xl:grid-cols-[2fr_3fr] border border-slate-300 rounded-lg p-3 md:p-5 gap-4 md:gap-8">

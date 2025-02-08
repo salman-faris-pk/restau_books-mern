@@ -33,7 +33,6 @@ router.post("/",verifyToken,[
 
 
 router.get("/",verifyToken,GetMyHotels)
-
 router.get("/:id",verifyToken,GetHotel)
 router.delete("/images/:hotelId",verifyToken, DeleteImages);
 router.put("/:hotelId",verifyToken,upload.array("imageFiles"),EditHotel)

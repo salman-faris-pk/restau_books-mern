@@ -4,6 +4,7 @@ import { BookingType, HotelSearchResponse, UserType } from "../types/types";
 import Stripe from "stripe"
 import mongoose from "mongoose";
 import User from "../models/user";
+import Wishlist from "../models/wishlist";
 
 
 
@@ -272,6 +273,68 @@ const Searchhotel = async (req: Request, res: Response): Promise<void> => {
   };
 
 
+  
+const AddToWishlist =async(req:Request,res:Response) : Promise<void>=>{
+  const userId=req.userId;
+  const { hotelId } = req.params;
+  try {
+    
+      await Wishlist.create({
+          userId,
+          hotelId,
+          status:true,
+      });
+
+      res.status(200).json({message:"Add to wishlist success!"})
+      
+  } catch (error) {
+   res.status(500).json({ message: "Something went throw" });
+  };
+};
+
+
+const isHotelInWishlist = async (req: Request, res: Response):Promise<void> => {
+  const userId = req.userId; 
+  const { hotelId } = req.params;
+
+  try {
+    const wishlistItem = await Wishlist.findOne({ userId, hotelId });
+
+    if (wishlistItem) {
+        res.status(200).json({ inWishlist: wishlistItem.status });
+        return;
+    };
+
+    res.status(200).json({ inWishlist: false });
+  } catch (error) {
+    res.status(500).json({ message: "Something went wrong" });
+  }
+};
+
+
+const removeFromWishlist = async (req: Request, res: Response):Promise<void> => {
+const userId = req.userId; 
+const { hotelId } = req.params; 
+
+try {
+  const wishlistItem = await Wishlist.findOneAndDelete({ userId, hotelId });
+
+  if (!wishlistItem) {
+     res.status(404).json({ message: "Hotel not found in wishlist" });
+     return;
+  }
+
+  res.status(200).json({ message: "Removed from wishlist successfully" });
+} catch (error) {
+  res.status(500).json({ message: "Something went wrong" });
+}
+};
+
+const fetchAllWishlistByUser =async(req:Request,res:Response)=>{
+
+
+};
+
 
 
 export {
@@ -280,4 +343,7 @@ export {
     StripePaymentIntent,
     BookTheHotel,
     getLatesthotels,
+    isHotelInWishlist,
+    AddToWishlist,
+    removeFromWishlist,
 }

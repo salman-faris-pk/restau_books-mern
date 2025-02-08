@@ -233,3 +233,38 @@ export const fetchmyBookings = async() : Promise<Hotel[]>=>{
   };
   return response.data;
 };
+
+
+
+export const WishListStatus = async(hotelId:string)=>{
+  const response=await axiosInstance.get(`/hotels/wishlist/${hotelId}`);
+  if(response.status !== 200){
+    throw new Error("Unables to fetch wishlist status");
+  };
+
+  return response.data;
+
+};
+
+export const AddToWishlist = async(hotelId:string)=>{
+  const response=await axiosInstance.post(`/hotels/wishlist/${hotelId}`);
+
+  if(response.status !== 200){
+    throw new Error("error in Add to wishlist");
+  };
+
+  return response.data;
+
+};
+
+export const removeWishlist = async(hotelId:string)=>{
+  const response=await axiosInstance.delete(`/hotels/wishlist/${hotelId}`);
+
+  if(response.status !== 200){
+    throw new Error("error in Add to wishlist");
+  };
+
+  return response.data;
+
+};
+

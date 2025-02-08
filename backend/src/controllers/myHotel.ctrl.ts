@@ -2,6 +2,7 @@ import { Request,Response } from "express";
 import { HotelType } from "../types/types"
 import cloudinary from "cloudinary";
 import Hotel from "../models/hotel"
+import Wishlist from "../models/wishlist";
 
 
 
@@ -84,7 +85,6 @@ const EditHotel =async(req:Request,res:Response): Promise<void> => {
 
     try {
         const updatedHotel: HotelType = req.body;
-        updatedHotel.lastUpdated = new Date();
 
         const hotel= await Hotel.findOneAndUpdate(
             {
@@ -161,5 +161,5 @@ export {
     GetMyHotels,
     GetHotel,
     EditHotel,
-    DeleteImages
-}
+    DeleteImages,
+};

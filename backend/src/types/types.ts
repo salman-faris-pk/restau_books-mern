@@ -1,3 +1,4 @@
+import mongoose from "mongoose";
 
 export type UserType = {
     _id: string;
@@ -21,7 +22,6 @@ export type UserType = {
     pricePerNight: number;
     starRating: number;
     imageUrls: string[];
-    lastUpdated: Date;
     bookings: BookingType[];
   };
   
@@ -54,3 +54,10 @@ export type UserType = {
     clientSecret: string;
     totalCost: number;
   };
+
+  export type WishlistType ={
+    _id:mongoose.Schema.Types.ObjectId;
+    userId:mongoose.Schema.Types.ObjectId;
+    hotelId: mongoose.Schema.Types.ObjectId;
+    status:boolean;
+  }
