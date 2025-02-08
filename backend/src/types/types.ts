@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+
 
 export type UserType = {
     _id: string;
@@ -55,9 +55,3 @@ export type UserType = {
     totalCost: number;
   };
 
-  export type WishlistType ={
-    _id:mongoose.Schema.Types.ObjectId;
-    userId:mongoose.Schema.Types.ObjectId;
-    hotelId: mongoose.Schema.Types.ObjectId;
-    status:boolean;
-  }

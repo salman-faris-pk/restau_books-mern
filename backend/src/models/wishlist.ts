@@ -1,5 +1,12 @@
 import mongoose from "mongoose";
-import { WishlistType } from "../types/types";
+
+
+type WishlistType = {
+  _id:mongoose.Schema.Types.ObjectId;
+  userId:mongoose.Schema.Types.ObjectId;
+  hotelId: mongoose.Schema.Types.ObjectId;
+  status:boolean;
+}
 
 const wishlistSchema = new mongoose.Schema<WishlistType>(
   {
