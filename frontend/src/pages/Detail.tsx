@@ -71,9 +71,9 @@ const Detail = () => {
        {isLoggedIn ? (
   <span>
     {CurrentStatus?.inWishlist ? (
-      <MdBookmarkAdded size={40} onClick={()=> removeFromWishlist} />
+      <MdBookmarkAdded size={40} onClick={()=> removeFromWishlist()} />
     ) : (
-      <CiBookmark size={40} onClick={()=> addToWishlist} />
+      <CiBookmark size={40} onClick={()=> addToWishlist()} />
     )}
   </span>
 ) : null}
