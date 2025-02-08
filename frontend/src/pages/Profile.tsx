@@ -37,6 +37,15 @@ const Profile = () => {
     queryKey: ["wishlist"],
     queryFn: apiClient.Wishlist,
   });
+  const { mutate: removeFromWishlist } = useMutation({
+    mutationFn: (hotelId: string) => apiClient.removeWishlist(hotelId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["wishlist"] });
+    },
+    onError: () => {
+      showToast({ message: "Failed to remove from wishlist!", type: "ERROR" });
+    },
+  });
 
   const mutation = useMutation({
     mutationFn: apiClient.SignOut,
@@ -49,16 +58,7 @@ const Profile = () => {
     },
   });
 
-  const { mutate: removeFromWishlist } = useMutation({
-    mutationFn: (hotelId: string) => apiClient.removeWishlist(hotelId),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["wishlist"] });
-      showToast({ message: "Removed from wishlist!", type: "SUCCESS" });
-    },
-    onError: () => {
-      showToast({ message: "Failed to remove from wishlist!", type: "ERROR" });
-    },
-  });
+
 
   const handleLogout = () => {
     mutation.mutate();

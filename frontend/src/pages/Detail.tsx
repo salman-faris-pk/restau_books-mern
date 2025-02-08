@@ -34,7 +34,6 @@ const Detail = () => {
     mutationFn: () => apiClient.AddToWishlist(hotelId as string),
     onSuccess: () => {
       queryClient.invalidateQueries({queryKey:["fetchStatus"]});
-      showToast({message:"Added to wishlist!", type:"SUCCESS"})
     },
     onError: () => {
       showToast({message:"failed to Add wishlist!", type:"ERROR"})
@@ -46,7 +45,6 @@ const Detail = () => {
     mutationFn: () => apiClient.removeWishlist(hotelId as string),
     onSuccess: () => {
       queryClient.invalidateQueries({queryKey:["fetchStatus"]});
-      showToast({message:"Remove from wishlist!", type:"SUCCESS"})
     },
     onError: () => {
       showToast({message:"failed to remove from  wishlist!", type:"ERROR"})
