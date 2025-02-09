@@ -39,13 +39,14 @@ const Profile = () => {
   });
   const { mutate: removeFromWishlist } = useMutation({
     mutationFn: (hotelId: string) => apiClient.removeWishlist(hotelId),
+    onSuccess:()=> {
+      // queryClient.invalidateQueries({ queryKey: ["fetchStatus"] }); 
+      queryClient.invalidateQueries({ queryKey: ["wishlist"] });
+    },
     onError: () => {
       showToast({ message: "Failed to remove from wishlist!", type: "ERROR" });
     },
-    onSettled: ()=> {
-      queryClient.invalidateQueries({ queryKey: ["wishlist"] });
-
-    },
+   
   });
 
   const mutation = useMutation({

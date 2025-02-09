@@ -275,17 +275,19 @@ const Searchhotel = async (req: Request, res: Response): Promise<void> => {
 
   
 const AddToWishlist =async(req:Request,res:Response) : Promise<void>=>{
-  const userId=req.userId;
-  const { hotelId } = req.params;
+  
   try {
     
-      await Wishlist.create({
-          userId,
-          hotelId,
-          status:true,
-      });
+    const userId = req.userId;
+    const { hotelId } = req.params;
 
-      res.status(200).json({message:"Add to wishlist success!"})
+    await Wishlist.updateOne(
+      { userId, hotelId },
+      { $set: { status: true } },
+      { upsert: true }
+    );
+
+    res.status(200).json({ message: "Added to wishlist successfully!" });
       
   } catch (error) {
    res.status(500).json({ message: "Something went throw" });
@@ -294,18 +296,18 @@ const AddToWishlist =async(req:Request,res:Response) : Promise<void>=>{
 
 
 const isHotelInWishlist = async (req: Request, res: Response):Promise<void> => {
-  const userId = req.userId; 
-  const { hotelId } = req.params;
 
   try {
-    const wishlistItem = await Wishlist.findOne({ userId, hotelId });
 
-    if (wishlistItem) {
-        res.status(200).json({ inWishlist: wishlistItem.status });
-        return;
-    };
+    const userId = req.userId;
+    const { hotelId } = req.params;
 
-    res.status(200).json({ inWishlist: false });
+    const wishlistItem = await Wishlist.findOne({ userId, hotelId }).select("status").lean();
+
+    res.status(200).json({ 
+      inWishlist: wishlistItem ? wishlistItem.status : false 
+    });
+    
   } catch (error) {
     res.status(500).json({ message: "Something went wrong" });
   }
@@ -317,11 +319,11 @@ const userId = req.userId;
 const { hotelId } = req.params; 
 
 try {
-  const wishlistItem = await Wishlist.findOneAndDelete({ userId, hotelId });
+  const deleted = await Wishlist.deleteOne({ userId, hotelId });
 
-  if (!wishlistItem) {
-     res.status(404).json({ message: "Hotel not found in wishlist" });
-     return;
+  if (deleted.deletedCount === 0) {
+    res.status(404).json({ message: "Hotel not found in wishlist" });
+    return;
   }
 
   res.status(200).json({ message: "Removed from wishlist successfully" });

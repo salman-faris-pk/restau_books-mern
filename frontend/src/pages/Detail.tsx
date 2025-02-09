@@ -9,6 +9,7 @@ import { useState } from "react";
 import { useAppContext } from "../contexts/AppContext";
 import { useOptimistic } from 'react';
 
+
 const Detail = () => {
   const queryClient = useQueryClient();
   const { hotelId } = useParams();
@@ -19,6 +20,7 @@ const Detail = () => {
     queryKey: ["fetchStatus", hotelId],
     queryFn: () => apiClient.WishListStatus(hotelId as string),
     enabled: !!hotelId,
+    refetchOnWindowFocus: false,
   });
 
   const { data: hotel } = useQuery({
@@ -37,13 +39,12 @@ const Detail = () => {
     onMutate: () => {
       setOptimisticStatus(true);
     },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["fetchStatus"] });
+    },
     onError: () => {
       setOptimisticStatus(false);
       showToast({ message: "Failed to add to wishlist!", type: "ERROR" });
-    },
-    onSettled: () => {
-      // Refetch the status after the mutation is settled (success or error)
-      queryClient.invalidateQueries({ queryKey: ["fetchStatus"] });
     },
   });
 
@@ -52,12 +53,12 @@ const Detail = () => {
     onMutate: () => {
       setOptimisticStatus(false);
     },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["fetchStatus"] });
+    },
     onError: () => {
       setOptimisticStatus(true);
       showToast({ message: "Failed to remove from wishlist!", type: "ERROR" });
-    },
-    onSettled: () => {
-      queryClient.invalidateQueries({ queryKey: ["fetchStatus"] });
     },
   });
 
@@ -150,3 +151,6 @@ const Detail = () => {
 };
 
 export default Detail;
+
+
+
