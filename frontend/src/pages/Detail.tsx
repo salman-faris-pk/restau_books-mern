@@ -16,7 +16,7 @@ const Detail = () => {
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const { showToast, isLoggedIn } = useAppContext();
 
-  const { data: CurrentStatus } = useQuery({
+  const { data: CurrentStatus} = useQuery({
     queryKey: ["fetchStatus", hotelId],
     queryFn: () => apiClient.WishListStatus(hotelId as string),
     enabled: !!hotelId,
@@ -64,7 +64,7 @@ const Detail = () => {
 
   if (!hotel) {
     return <></>;
-  }
+  };
 
   return (
     <div className="space-y-6 px-2 md:px-0">
