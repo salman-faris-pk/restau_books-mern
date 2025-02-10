@@ -281,3 +281,11 @@ export const Wishlist = async() :Promise<WishlistItem[]> =>{
 };
 
 
+export const getDates=async(hotelId:string)=> {
+  const response=await axiosInstance.get(`/hotels/${hotelId}/dates`);
+  if(response.status !== 200){
+    throw new Error("error fetching dates");
+  };
+  return response.data;
+
+};

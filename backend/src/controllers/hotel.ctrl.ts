@@ -352,6 +352,33 @@ const fetchAllWishlistByUser = async(req:Request,res:Response)=>{
 };
 
 
+const GetAlldatesStartToEnd =async(req:Request,res:Response): Promise<void>=>{
+  try {
+    const hotelId = req.params.hotelId;
+
+    const hotel = await Hotel.findById(hotelId);
+    if (!hotel) {
+       res.status(404).json({ message: "Hotel not found" });
+       return;
+    };
+
+    const checkInDates = hotel.bookings.map(booking => booking.checkIn);
+    const checkOutDates = hotel.bookings.map(booking => booking.checkOut);
+
+    const earliestCheckIn = new Date(Math.min(...checkInDates.map(date => date.getTime())));
+    const latestCheckOut = new Date(Math.max(...checkOutDates.map(date => date.getTime())));
+
+    res.status(200).json({
+      earliestCheckIn,
+      latestCheckOut,
+    });
+    
+  } catch (error) {
+  res.status(500).json({ message: "Something went wrong" });
+  }
+};
+
+
 
 export {
     Searchhotel,
@@ -362,5 +389,6 @@ export {
     isHotelInWishlist,
     AddToWishlist,
     removeFromWishlist,
-    fetchAllWishlistByUser
+    fetchAllWishlistByUser,
+    GetAlldatesStartToEnd
 }

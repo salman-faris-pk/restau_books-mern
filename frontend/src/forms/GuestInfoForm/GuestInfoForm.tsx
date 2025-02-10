@@ -5,6 +5,7 @@ import { useAppContext } from "../../contexts/AppContext";
 import DatePicker from 'react-datepicker';
 import { useQuery } from "@tanstack/react-query";
 import * as apiClient from "../../api/api-client"
+import { getDisabledDates } from "../../utils/DisableDates";
 
 
 type Props = {
@@ -24,8 +25,14 @@ const GuestInfoForm = ({ hotelId, pricePerNight,hotelUserId }: Props) => {
     const search=useSearchContext()
     const navigate = useNavigate();
     const location = useLocation();
-    const { isLoggedIn } = useAppContext();
-  
+    const { isLoggedIn,showToast} = useAppContext();
+
+    const {data: dates}=useQuery({
+      queryKey:["fetchDates",hotelId],
+      queryFn: ()=> apiClient.getDates(hotelId),
+      enabled: !!hotelId
+    });
+
 
     const {register,watch,setValue,handleSubmit,formState: { errors }}=useForm<GuestInfoFormData>({
       defaultValues: {
@@ -51,6 +58,11 @@ const GuestInfoForm = ({ hotelId, pricePerNight,hotelUserId }: Props) => {
     };
 
     const onSubmit = (data: GuestInfoFormData) => {
+      if (data.checkIn.toDateString() === data.checkOut.toDateString()) {
+        showToast({message:"Check-in and Check-out cannot be the same date",type:"ERROR"});
+        return;
+      };
+    
       search.saveSearchValues(
         "",
         data.checkIn,
@@ -72,6 +84,9 @@ const GuestInfoForm = ({ hotelId, pricePerNight,hotelUserId }: Props) => {
       });
    
       const sameUser= currentUser?._id && currentUser._id === hotelUserId;
+      const disabledDates = dates?.earliestCheckIn && dates?.latestCheckOut
+       ? getDisabledDates(dates?.earliestCheckIn, dates?.latestCheckOut)
+      : [];
 
   return (
     <div className="flex flex-col p-4 ml-2 bg-blue-200 rounded-sm gap-4">
@@ -90,11 +105,13 @@ const GuestInfoForm = ({ hotelId, pricePerNight,hotelUserId }: Props) => {
             selectsStart
             startDate={checkIn}
             endDate={checkOut}
-            minDate={minDate}
+            minDate={checkIn ? new Date(checkIn.getTime() + 24 * 60 * 60 * 1000) : minDate}
             maxDate={maxDate}
             placeholderText="Check-in Date"
             className="min-w-full bg-white p-2 focus:outline-none"
             wrapperClassName="min-w-full"
+            excludeDates={disabledDates}
+            dayClassName={(date) => disabledDates.some(d => d.toDateString() === date.toDateString()) ? "bg-red-500 text-white disabled-day" : ""}
           />
         </div>
         <div>
@@ -110,6 +127,8 @@ const GuestInfoForm = ({ hotelId, pricePerNight,hotelUserId }: Props) => {
             placeholderText="Check-in Date"
             className="min-w-full bg-white p-2 focus:outline-none"
             wrapperClassName="min-w-full"
+            excludeDates={disabledDates}
+            dayClassName={(date) => disabledDates.some(d => d.toDateString() === date.toDateString()) ? "bg-red-500 text-white disabled-day" : ""}  
           />
         </div>
         <div className="flex bg-white px-2 py-1 gap-2">
@@ -180,3 +199,5 @@ const GuestInfoForm = ({ hotelId, pricePerNight,hotelUserId }: Props) => {
 }
 
 export default GuestInfoForm
+
+ 

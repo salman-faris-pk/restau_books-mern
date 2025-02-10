@@ -23,6 +23,7 @@ const MyBookings = () => {
     const {data:hotels,isLoading}=useQuery({
         queryKey:["fetchMyBookings"],
         queryFn:()=> apiClient.fetchmyBookings(),
+        refetchOnWindowFocus: false,
     });
     
    

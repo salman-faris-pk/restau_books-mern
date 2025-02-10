@@ -3,6 +3,7 @@
 @tailwind utilities;
 
 
-/* html, body {
-    overflow-x: hidden;
-} */
+.disabled-day {
+    opacity: 0.6;
+    pointer-events: none;
+  }

@@ -3,7 +3,7 @@ import { PaymentIntentResponse, UserType } from "../../../../backend/src/types/t
 import { useSearchContext } from "../../contexts/Searchcontext";
 import { useNavigate, useParams } from "react-router-dom";
 import { useAppContext } from "../../contexts/AppContext";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import * as apiClient from "../../api/api-client"
 import { CardElement, useElements, useStripe } from "@stripe/react-stripe-js";
 import { StripeCardElement } from "@stripe/stripe-js";
@@ -40,12 +40,15 @@ const BookingForm = ({currentUser,paymentIntent}:Props) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
  const [loading,setLoading]=useState(false)
  const navigate=useNavigate()
+ const queryClient = useQueryClient();
+
 
   const { showToast }=useAppContext();
 
   const {mutate: bookRoom}=useMutation({
    mutationFn: apiClient.createRoomBooking,
    onSuccess: () => {
+    queryClient.invalidateQueries({ queryKey: ["fetchMyBookings"] });
      showToast({message:"Booking Saved!", type: "SUCCESS"});
    },
    onError: () => {
