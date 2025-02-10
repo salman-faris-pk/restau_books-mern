@@ -125,6 +125,7 @@ const GuestInfoForm = ({ hotelId, pricePerNight,hotelUserId }: Props) => {
             minDate={minDate}
             maxDate={maxDate}
             placeholderText="Check-in Date"
+            popperPlacement="top-start"
             className="min-w-full bg-white p-2 focus:outline-none"
             wrapperClassName="min-w-full"
             excludeDates={disabledDates}
