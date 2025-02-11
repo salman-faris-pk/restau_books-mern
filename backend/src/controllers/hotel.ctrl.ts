@@ -199,8 +199,23 @@ const Searchhotel = async (req: Request, res: Response): Promise<void> => {
         return;
       };
 
+      const totalCost = paymentIntent.amount / 100;
+      const hotelOwner = await User.findOneAndUpdate(
+        { _id: hotel.userId },
+        { $inc: { earned: totalCost } },
+        { session, new: true }
+      );
+  
+      if (!hotelOwner) {
+        await session.abortTransaction();
+        session.endSession();
+        res.status(400).json({ message: "Hotel owner not found" });
+        return;
+      }
+
       await session.commitTransaction();
       session.endSession();
+
       res.status(200).send();
 
       

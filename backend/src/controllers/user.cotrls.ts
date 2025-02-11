@@ -128,7 +128,8 @@ const Profile=async(req:Request,res:Response): Promise<void>=> {
       lastname: user.lastName,
       email: user.email,
       productCount: myHotels.length,
-      bookingsCount
+      bookingsCount,
+      earned:user.earned,
     });
 
      

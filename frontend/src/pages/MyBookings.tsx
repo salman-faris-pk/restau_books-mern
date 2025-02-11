@@ -38,7 +38,7 @@ const MyBookings = () => {
   return (
     <>
      {!hotels || hotels.length === 0 ? (
-        <span className="text-gray-500 font-semibold">No bookings found. Start planning your next stay today!😊</span>
+        <span className="text-gray-500 md:font-semibold">No bookings found. Start planning your next stay today!😊</span>
      ): (
         
       <div className="space-y-5 px-2 md:px-0">

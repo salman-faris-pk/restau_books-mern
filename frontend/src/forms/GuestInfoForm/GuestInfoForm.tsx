@@ -6,6 +6,9 @@ import DatePicker from 'react-datepicker';
 import { useQuery } from "@tanstack/react-query";
 import * as apiClient from "../../api/api-client"
 import { getDisabledDates } from "../../utils/DisableDates";
+import { useEffect } from "react";
+
+
 
 
 type Props = {
@@ -34,14 +37,25 @@ const GuestInfoForm = ({ hotelId, pricePerNight,hotelUserId }: Props) => {
     });
 
 
-    const {register,watch,setValue,handleSubmit,formState: { errors }}=useForm<GuestInfoFormData>({
+    const {register,watch,setValue,handleSubmit,reset,formState: { errors }}=useForm<GuestInfoFormData>({
       defaultValues: {
-        checkIn: search.checkIn,
+        checkIn: dates?.latestCheckOut ? new Date(dates?.latestCheckOut): search.checkIn,
         checkOut: search.checkOut,
         adultCount: search.adultCount,
         childCount: search.childCount,
-      }
+      },
     });
+
+    useEffect(() => {
+      if (dates?.latestCheckOut) {
+        reset({
+          checkIn: new Date(dates?.latestCheckOut),
+          checkOut: search.checkOut,
+          adultCount: search.adultCount,
+          childCount: search.childCount,
+        });
+      }
+    }, [dates?.latestCheckOut, reset]); 
 
     const checkIn = watch("checkIn");
     const checkOut = watch("checkOut");
@@ -58,8 +72,11 @@ const GuestInfoForm = ({ hotelId, pricePerNight,hotelUserId }: Props) => {
     };
 
     const onSubmit = (data: GuestInfoFormData) => {
-      if (data.checkIn.toDateString() === data.checkOut.toDateString()) {
-        showToast({message:"Check-in and Check-out cannot be the same date",type:"ERROR"});
+      if (data.checkOut.getTime() < data.checkIn.getTime()) {
+        showToast({ message: "Check-out must be after check-in", type: "ERROR" });
+        return;
+      } else if (data.checkOut.getTime() === data.checkIn.getTime()) {
+        showToast({ message: "Check-in and Check-out dates are the same", type: "ERROR" });
         return;
       };
     
@@ -87,10 +104,29 @@ const GuestInfoForm = ({ hotelId, pricePerNight,hotelUserId }: Props) => {
       const disabledDates = dates?.earliestCheckIn && dates?.latestCheckOut
        ? getDisabledDates(dates?.earliestCheckIn, dates?.latestCheckOut)
       : [];
+    
+      const handlereset = (e: React.MouseEvent<HTMLButtonElement>) => {
+        e.preventDefault();
+        
+        reset({
+          checkIn: dates?.latestCheckOut ? new Date(dates?.latestCheckOut) : search.checkIn,
+          checkOut: search.checkOut,
+          adultCount: search.adultCount,
+          childCount: search.childCount,
+        });
+
+        const keysToRemove = ["destination", "checkIn", "checkOut","adultCount","childCount"];
+        keysToRemove.forEach((key) => sessionStorage.removeItem(key));
+      };
 
   return (
     <div className="flex flex-col p-4 ml-2 bg-blue-200 rounded-sm gap-4">
-    <h3 className="text-md font-bold">₹ {pricePerNight} <span className="text-sm font-normal text-gray-600">/ night</span></h3>
+      <div className="flex justify-between items-center">
+       <h3 className="text-md font-bold">₹ {pricePerNight} <span className="text-sm font-normal text-gray-600">/ night</span></h3>
+      <button type="reset" className="px-4 py-1 bg-gray-600 text-white rounded-md hover:bg-gray-700 transition duration-300 flex items-center justify-center" onClick={handlereset}>
+        Reset
+      </button>
+    </div>
     <form
       onSubmit={
         isLoggedIn ? handleSubmit(onSubmit) : handleSubmit(onSignInClick)
@@ -110,7 +146,7 @@ const GuestInfoForm = ({ hotelId, pricePerNight,hotelUserId }: Props) => {
             placeholderText="Check-in Date"
             className="min-w-full bg-white p-2 focus:outline-none"
             wrapperClassName="min-w-full"
-            excludeDates={disabledDates}
+            excludeDates={disabledDates || []}
             dayClassName={(date) => disabledDates.some(d => d.toDateString() === date.toDateString()) ? "bg-red-500 text-white disabled-day" : ""}
           />
         </div>
@@ -128,7 +164,7 @@ const GuestInfoForm = ({ hotelId, pricePerNight,hotelUserId }: Props) => {
             popperPlacement="top-start"
             className="min-w-full bg-white p-2 focus:outline-none"
             wrapperClassName="min-w-full"
-            excludeDates={disabledDates}
+            excludeDates={disabledDates || []}
             dayClassName={(date) => disabledDates.some(d => d.toDateString() === date.toDateString()) ? "bg-red-500 text-white disabled-day" : ""}  
           />
         </div>

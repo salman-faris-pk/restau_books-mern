@@ -10,6 +10,7 @@ export interface UserProfileResponse {
   email: string;
   productCount: number;
   bookingsCount: number;
+  earned:number;
 }
 
 export interface WishlistItem {
@@ -30,8 +31,10 @@ const Profile = () => {
   const { data: user, isLoading } = useQuery({
     queryKey: ["userprofile"],
     queryFn: apiClient.userProfile,
+    refetchOnWindowFocus: false,
     staleTime: 1000 * 60 * 5,
   });
+  
 
   const { data: wishlist } = useQuery({
     queryKey: ["wishlist"],
@@ -100,6 +103,12 @@ const Profile = () => {
             </label>
             <p className="mt-1 text-lg text-gray-900">{user?.productCount}</p>
           </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700">
+               Earned
+            </label>
+            <p className="mt-1 text-lg text-gray-900">{user?.earned ? `₹${user?.earned}` : "N/A"}</p>
+          </div>
 
           <div>
             <label className="block text-sm font-medium text-gray-700">
@@ -107,6 +116,7 @@ const Profile = () => {
             </label>
             <p className="mt-1 text-lg text-gray-900">{user?.bookingsCount}</p>
           </div>
+          
         </div>
 
         <button

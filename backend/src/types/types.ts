@@ -6,6 +6,7 @@ export type UserType = {
     password: string;
     firstName: string;
     lastName: string;
+    earned?: number;
   };
 
   export type HotelType = {
