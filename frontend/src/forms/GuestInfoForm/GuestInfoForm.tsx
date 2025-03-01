@@ -39,7 +39,9 @@ const GuestInfoForm = ({ hotelId, pricePerNight,hotelUserId }: Props) => {
 
     const {register,watch,setValue,handleSubmit,reset,formState: { errors }}=useForm<GuestInfoFormData>({
       defaultValues: {
-        checkIn: dates?.latestCheckOut ? new Date(dates?.latestCheckOut): search.checkIn,
+        checkIn: dates?.latestCheckOut && new Date(dates.latestCheckOut) >= new Date()
+      ? new Date(dates.latestCheckOut)
+      : search.checkIn,
         checkOut: search.checkOut,
         adultCount: search.adultCount,
         childCount: search.childCount,
@@ -47,15 +49,13 @@ const GuestInfoForm = ({ hotelId, pricePerNight,hotelUserId }: Props) => {
     });
 
     useEffect(() => {
-      if (dates?.latestCheckOut) {
-        reset({
-          checkIn: new Date(dates?.latestCheckOut),
-          checkOut: search.checkOut,
-          adultCount: search.adultCount,
-          childCount: search.childCount,
-        });
+      if (dates?.latestCheckOut && new Date(dates.latestCheckOut) >= new Date()) {
+        reset((prevValues) => ({
+          ...prevValues,
+          checkIn: new Date(dates.latestCheckOut),
+        }));
       }
-    }, [dates?.latestCheckOut, reset]); 
+    }, [dates?.latestCheckOut, reset]);
 
     const checkIn = watch("checkIn");
     const checkOut = watch("checkOut");
