@@ -14,7 +14,9 @@ const Detail = () => {
   const queryClient = useQueryClient();
   const { hotelId } = useParams();
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
-  const { showToast, isLoggedIn } = useAppContext();
+  const { showToast, isLoggedIn,loginuserId } = useAppContext();
+  
+
 
   const { data: CurrentStatus} = useQuery({
     queryKey: ["fetchStatus", hotelId],
@@ -28,6 +30,11 @@ const Detail = () => {
     queryFn: () => apiClient.fetchHotelbyId(hotelId as string),
     enabled: !!hotelId,
   });
+
+const trimmedLoginUserId = loginuserId?.trim();
+const trimmedHotelUserId = hotel?.userId?.trim();
+
+const isUserHotelOwner = trimmedLoginUserId === trimmedHotelUserId;
 
   const [optimisticStatus, setOptimisticStatus] = useOptimistic(
     CurrentStatus?.inWishlist || false,
@@ -76,15 +83,15 @@ const Detail = () => {
         </span>
         <div className="flex justify-between cursor-pointer">
           <h1 className="text-3xl font-bold">{hotel.name}</h1>
-          {isLoggedIn ? (
-            <span>
+          {isLoggedIn && hotel?.userId &&  (
+            <span  className={`${isUserHotelOwner ? "hidden" : "block"}`}>
               {optimisticStatus ? (
                 <IoBookmark size={42} onClick={() => removeFromWishlist()} />
               ) : (
                 <CiBookmark size={42} onClick={() => addToWishlist()} />
               )}
             </span>
-          ) : null}
+          )}
         </div>
       </div>
 

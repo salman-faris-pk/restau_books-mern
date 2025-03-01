@@ -27,6 +27,7 @@ export const register = async (formData: RegisterFormData) => {
     if (response.status !== 200) {
       throw new Error("Token invalid");
     };
+    
 
     return response.data;
 
