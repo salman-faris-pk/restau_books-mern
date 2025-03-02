@@ -4,7 +4,7 @@ import ProtectedRoute from "./layouts/ProtectedRoute";
 import Profile from "./pages/Profile";
 import { lazy, Suspense } from "react";
 
-const LazyLoad = (Component: React.LazyExoticComponent<() => JSX.Element>) => (
+const LazyLoad = (Component: React.LazyExoticComponent<() => React.ReactElement>) => (
   <Suspense fallback={<div className="text-gray-400">Loading...</div>}>
     <Component />
   </Suspense>
