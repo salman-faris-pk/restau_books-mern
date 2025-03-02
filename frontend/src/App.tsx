@@ -1,7 +1,15 @@
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
-import { Suspense, lazy } from "react";
-import {AuthLayout,MainLayout} from "./layouts/Layouts"
+import MainLayout from "./layouts/Layouts";
+import ProtectedRoute from "./layouts/ProtectedRoute";
 import Profile from "./pages/Profile";
+import { lazy, Suspense } from "react";
+
+const LazyLoad = (Component: React.LazyExoticComponent<() => JSX.Element>) => (
+  <Suspense fallback={<div className="text-gray-400">Loading...</div>}>
+    <Component />
+  </Suspense>
+);
+
 const Homepage = lazy(() => import("./pages/Homepage"));
 const Register = lazy(() => import("./pages/Register"));
 const SignIn = lazy(() => import("./pages/SignIn"));
@@ -13,120 +21,28 @@ const Detail = lazy(() => import("./pages/Detail"));
 const Booking = lazy(() => import("./pages/Booking"));
 const MyBookings = lazy(() => import("./pages/MyBookings"));
 
-function App() {
-  const router = createBrowserRouter([
-    {
-      path: "/",
-      element: (
-        <Suspense fallback={<div className="text-gray-400">Loading...</div>}>
-          <MainLayout />
-        </Suspense>
-      ),
-      children: [
-        {
-          path: "/",
-          element: (
-            <Suspense fallback={<div className="text-gray-200">Loading...</div>}>
-              <Homepage />
-            </Suspense>
-          ),
-        },
-        {
-          path: "/search",
-          element: (
-            <Suspense fallback={<div className="text-gray-400">Loading...</div>}
-            >
-              <Search />
-            </Suspense>
-          ),
-        },
-        {
-          path: "/detail/:hotelId",
-          element: (
-            <Suspense fallback={<div className="text-gray-400">Loading...</div>}>
-              <Detail />
-            </Suspense>
-          ),
-        },
-        {
-          path: "/register",
-          element: (
-            <Suspense fallback={<div className="text-gray-400">Loading...</div>}>
-              <Register />
-            </Suspense>
-          ),
-        },
-        {
-          path: "/sign-in",
-          element: (
-            <Suspense fallback={<div>Loading...</div>}>
-              <SignIn />
-            </Suspense>
-          ),
-        },
-      ],
-    },
-    {
-      path: "/",
-      element: (
-        <Suspense fallback={<div className="text-gray-400">Loading...</div>}>
-          <AuthLayout />
-        </Suspense>
-      ),
-      children: [
-        {
-          path: "/add-hotel",
-          element: (
-            <Suspense fallback={<div className="text-gray-400">Loading...</div>}>
-              <AddHotel />
-            </Suspense>
-          ),
-        },
-        {
-          path: "/my-hotels",
-          element: (
-            <Suspense fallback={<div className="text-gray-400">Loading...</div>}>
-              <MyHotels />
-            </Suspense>
-          ),
-        },
-        {
-          path: "/edit-hotel/:hotelId",
-          element: (
-            <Suspense fallback={<div className="text-gray-400">Loading...</div>}>
-              <EditHotel />
-            </Suspense>
-          ),
-        },
-        {
-          path: "/hotel/:hotelId/booking",
-          element: (
-            <Suspense fallback={<div className="text-gray-400">Loading...</div>}>
-              <Booking />
-            </Suspense>
-          ),
-        },
-        {
-          path: "/my-bookings",
-          element: (
-            <Suspense fallback={<div className="text-gray-400">Loading...</div>}>
-              <MyBookings />
-            </Suspense>
-          ),
-        },
-        {
-          path: "/profile",
-          element: (
-            <Suspense fallback={<div className="text-gray-400">Loading...</div>}>
-              <Profile />
-            </Suspense>
-          ),
-        },
-      ],
-    },
-  ]);
+const router = createBrowserRouter([
+  {
+    path: "/",
+    element: <MainLayout />,
+    children: [
+      { path: "/", element: LazyLoad(Homepage) },
+      { path: "/search", element: LazyLoad(Search) },
+      { path: "/detail/:hotelId", element: LazyLoad(Detail) },
+      { path: "/register", element: LazyLoad(Register) },
+      { path: "/sign-in", element: LazyLoad(SignIn) },
 
-  return <RouterProvider router={router} />;
-}
+      // **Protected Routes**
+      { path: "/add-hotel", element: <ProtectedRoute element={<AddHotel />} /> },
+      { path: "/my-hotels", element: <ProtectedRoute element={<MyHotels />} /> },
+      { path: "/edit-hotel/:hotelId", element: <ProtectedRoute element={<EditHotel />} /> },
+      { path: "/hotel/:hotelId/booking", element: <ProtectedRoute element={<Booking />} /> },
+      { path: "/my-bookings", element: <ProtectedRoute element={<MyBookings />} /> },
+      { path: "/profile", element: <ProtectedRoute element={<Profile />} /> },
+    ],
+  },
+]);
+
+const App = () => <RouterProvider router={router} />;
 
 export default App;
