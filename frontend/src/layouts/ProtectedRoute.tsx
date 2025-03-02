@@ -1,7 +1,7 @@
 import { Navigate, useLocation } from "react-router-dom";
 import { useAppContext } from "../contexts/AppContext";
 
-const ProtectedRoute = ({ element }: { element: JSX.Element }) => {
+const ProtectedRoute = ({ element }: { element: React.ReactElement }) => {
   const { isLoggedIn } = useAppContext();
   const location = useLocation();
 
