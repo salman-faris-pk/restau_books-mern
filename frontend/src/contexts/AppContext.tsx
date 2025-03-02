@@ -29,21 +29,21 @@ export const AppContextProvider=({children}: {children: React.ReactNode})=>{
 
     const [toast, setToast]=useState<ToastMessage | undefined>(undefined)
 
-     const { data,isError } = useQuery({
+     const { data,isError,isLoading} = useQuery({
         queryKey: ["validateToken"],
         queryFn: apiClient.validateToken,
         retry: false,
       });
 
       const loginuserId = data?.userId || null;
-      
+      const isLoggedInn = !isLoading && !isError
       
     return(
         <AppContext.Provider value={{
             showToast: (toastMessage) => {
                 setToast(toastMessage)
             },
-            isLoggedIn: !isError,  //if not error means logedin true
+            isLoggedIn: isLoggedInn,
             stripePromise,
             loginuserId:loginuserId
           }}>

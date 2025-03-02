@@ -27,6 +27,8 @@ const MainLayout = () => {
     [location.pathname]
   );
 
+  if (isLoggedIn === undefined) return null;
+
   if (!isLoggedIn && isProtected) {
     return <Navigate to="/sign-in" state={{ from: location }} replace />;
   }
