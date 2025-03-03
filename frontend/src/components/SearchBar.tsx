@@ -107,6 +107,7 @@ const SearchBar = () => {
         endDate={checkOut}
         minDate={minDate}
         maxDate={maxDate}
+        popperPlacement="top-start"
         placeholderText="Check-in Date"
         className="w-full md:min-w-full bg-white p-2 focus:outline-none"
         wrapperClassName="w-full md:min-w-full"
@@ -121,6 +122,7 @@ const SearchBar = () => {
         endDate={checkOut}
         minDate={minDate}
         maxDate={maxDate}
+        popperPlacement="top-start"
         placeholderText="Check-out Date"
         className="w-full md:min-w-full bg-white p-2 focus:outline-none"
         wrapperClassName="w-full md:min-w-full"
