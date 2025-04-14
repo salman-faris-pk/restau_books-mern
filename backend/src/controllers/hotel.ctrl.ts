@@ -186,7 +186,7 @@ const Searchhotel = async (req: Request, res: Response): Promise<void> => {
         {
           $push: { bookings: newBooking },
         },
-        { session }
+        { session, new:true }
       );
 
       if (!hotel) {
