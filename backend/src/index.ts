@@ -16,7 +16,7 @@ import cloudinaryConfig from "./config/cloudinary";
 const port=process.env.PORT || 7000;
 
 const limiter = rateLimit({
-  windowMs: 10 * 60 * 1000,
+  windowMs: 7 * 60 * 1000,
   max: 100
 });
 
