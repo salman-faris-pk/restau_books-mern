@@ -3,16 +3,35 @@ import User from "../models/user"
 import jwt from "jsonwebtoken";
 import bcrypt from "bcryptjs"
 import Hotel from "../models/hotel";
+import emailVerifier from "../helpers/emailVerifier";
 
 
 
 
 const Register=async(req:Request, res:Response): Promise<void> => {
    try {
+
+    const isEmailValid= await emailVerifier.verifyEmail(req.body.email);
+    
+    if (isEmailValid === null) {
+      res.status(503).json({
+        message: "Could not verify email at this time. Please try again later.",
+      });
+      return;
+    }
+    
+    if (!isEmailValid) {
+      res.status(401).json({
+        message: "Invalid email address. Please provide a valid email.",
+      });
+      return;
+    }
     
     let user= await User.findOne({
       email: req.body.email,
     });
+
+    
 
     if (user) {
         res.status(400).json({ message: "User already exists" });

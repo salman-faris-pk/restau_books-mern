@@ -5,9 +5,7 @@ import { useAppContext } from "../../contexts/AppContext";
 import DatePicker from 'react-datepicker';
 import { useQuery } from "@tanstack/react-query";
 import * as apiClient from "../../api/api-client"
-import { getDisabledDates } from "../../utils/DisableDates";
 import { useState } from "react";
-
 
 
 
@@ -31,13 +29,7 @@ const GuestInfoForm = ({ hotelId, pricePerNight,hotelUserId }: Props) => {
     const { isLoggedIn,showToast} = useAppContext();
     const [isCheckingAvailability, setIsCheckingAvailability] = useState(false);
 
-    const {data: dates}=useQuery({
-      queryKey:["fetchDates",hotelId],
-      queryFn: ()=> apiClient.getDates(hotelId),
-      enabled: !!hotelId
-    });
-     
-
+   
     const {register,watch,setValue,handleSubmit,reset,formState: { errors }}=useForm<GuestInfoFormData>({
       defaultValues: {
         checkIn: search.checkIn,
@@ -124,18 +116,16 @@ const GuestInfoForm = ({ hotelId, pricePerNight,hotelUserId }: Props) => {
       });
    
       const sameUser= currentUser?._id && currentUser._id === hotelUserId;
-      const disabledDates = dates?.earliestCheckIn && dates?.latestCheckOut
-       ? getDisabledDates(dates?.earliestCheckIn, dates?.latestCheckOut)
-      : [];
-    
+     
+  
       const handlereset = (e: React.MouseEvent<HTMLButtonElement>) => {
         e.preventDefault();
         
         reset({
-          checkIn: search.checkIn,
-          checkOut: search.checkOut,
-          adultCount: search.adultCount,
-          childCount: search.childCount,
+          checkIn: minDate,
+          checkOut: minDate,
+          adultCount: 1,
+          childCount: 0,
         });
 
         const keysToRemove = ["destination", "checkIn", "checkOut","adultCount","childCount"];
@@ -169,8 +159,6 @@ const GuestInfoForm = ({ hotelId, pricePerNight,hotelUserId }: Props) => {
             placeholderText="Check-in Date"
             className="min-w-full bg-white p-2 focus:outline-none"
             wrapperClassName="min-w-full"
-            excludeDates={disabledDates || []}
-            dayClassName={(date) => disabledDates.some(d => d.toDateString() === date.toDateString()) ? "bg-red-500 text-white disabled-day" : ""}
           />
         </div>
         <div>
@@ -187,8 +175,6 @@ const GuestInfoForm = ({ hotelId, pricePerNight,hotelUserId }: Props) => {
             popperPlacement="top-start"
             className="min-w-full bg-white p-2 focus:outline-none"
             wrapperClassName="min-w-full"
-            excludeDates={disabledDates || []}
-            dayClassName={(date) => disabledDates.some(d => d.toDateString() === date.toDateString()) ? "bg-red-500 text-white disabled-day" : ""}  
           />
         </div>
         <div className="flex bg-white px-2 py-1 gap-2">

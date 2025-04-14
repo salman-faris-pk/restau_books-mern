@@ -15,6 +15,7 @@ import { useState } from "react";
 type Props = {
   currentUser: UserType;
   paymentIntent: PaymentIntentResponse;
+  numberOfNights: number | string;
 };
 
 
@@ -29,9 +30,10 @@ export type BookingFormData = {
   hotelId: string;
   paymentIntentId: string;
   totalCost: number;
+  numberOfNights?:number | string;
 };
 
-const BookingForm = ({currentUser,paymentIntent}:Props) => {
+const BookingForm = ({currentUser,paymentIntent,numberOfNights}:Props) => {
  
   const stripe=useStripe();
   const elements=useElements();
@@ -68,10 +70,11 @@ const BookingForm = ({currentUser,paymentIntent}:Props) => {
       hotelId: hotelId,
       totalCost: paymentIntent.totalCost,
       paymentIntentId: paymentIntent.paymentIntentId,
+      numberOfNights: numberOfNights
     },
   });
 
-  const onSubmit = async(formData: BookingFormData)=> {
+  const onSubmit = async(formData: BookingFormData)=> {    
       setLoading(true)
      if(!stripe || !elements) {
        return;
@@ -98,8 +101,9 @@ const BookingForm = ({currentUser,paymentIntent}:Props) => {
        setLoading(false)
        setIsModalOpen(true);
        setTimeout(() => {
-         setIsModalOpen(false);
-         navigate("/my-bookings")
+         setIsModalOpen(false); 
+         navigate("/", { replace: true });
+         navigate("/my-bookings");
        }, 4000);
      };
 

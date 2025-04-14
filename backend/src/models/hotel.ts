@@ -13,6 +13,7 @@ const bookingSchema = new mongoose.Schema<BookingType>({
     checkOut: { type: Date, required: true },
     userId: { type: String, required: true },
     totalCost: { type: Number, required: true },
+    paymentIntentId: { type: String, required: true },
   });
   
   const hotelSchema = new mongoose.Schema<HotelType>({
@@ -36,8 +37,20 @@ const bookingSchema = new mongoose.Schema<BookingType>({
   },{
     timestamps: true
   });
+  
+  
+  bookingSchema.index({ userId: 1 });
+  bookingSchema.index({ hotelId: 1 });
+  bookingSchema.index({ checkIn: 1, checkOut: 1 });
 
-
+  hotelSchema.index({ userId: 1 }); 
+  hotelSchema.index({ city: 1 });
+  hotelSchema.index({ country: 1 });
+  hotelSchema.index({ 
+    city: 1,
+    country: 1 
+  });
+  hotelSchema.index({ name: 'text', description: 'text' }); 
 
   const Hotel = mongoose.model<HotelType>("Hotel", hotelSchema);
   

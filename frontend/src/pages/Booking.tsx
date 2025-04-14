@@ -75,7 +75,7 @@ const Booking = () => {
           options={{clientSecret: paymentIntentData.clientSecret}}
           key={paymentIntentData.clientSecret}
         >
-          <BookingForm currentUser={currentUser} paymentIntent={paymentIntentData}/>
+          <BookingForm currentUser={currentUser} paymentIntent={paymentIntentData} numberOfNights={numberOfNights}/>
         </Elements>
       )}
       

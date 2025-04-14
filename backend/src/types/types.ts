@@ -7,7 +7,7 @@ export type UserType = {
     firstName: string;
     lastName: string;
     earned?: number;
-  };
+};
 
   export type HotelType = {
     _id: string;
@@ -37,6 +37,8 @@ export type UserType = {
     checkIn: Date;
     checkOut: Date;
     totalCost: number;
+    paymentIntentId: string;
+    invoiceId:string;
   };
 
 
@@ -55,4 +57,7 @@ export type UserType = {
     clientSecret: string;
     totalCost: number;
   };
+
+
+  
 

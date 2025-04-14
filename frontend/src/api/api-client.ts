@@ -219,12 +219,12 @@ export const createPaymentIntent = async(hotelId:string,numberOfNights:string): 
 };
 
 
-export const createRoomBooking = async(formData: BookingFormData)=> {
-    const response= await axiosInstance.post(`/hotels/${formData.hotelId}/bookings`,formData);
-    if(response.status !==200){
-      throw new Error("Error booking room");
-    }; 
-};
+  export const createRoomBooking = async(formData: BookingFormData)=> {
+      const response= await axiosInstance.post(`/hotels/${formData.hotelId}/bookings`,formData);
+      if(response.status !==200){
+        throw new Error("Error booking room");
+      }; 
+  };
 
 
 export const fetchmyBookings = async() : Promise<Hotel[]>=>{

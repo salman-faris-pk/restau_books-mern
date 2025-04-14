@@ -29,9 +29,9 @@ const MainLayout = () => {
   );
 
   if (isAuthLoading) {
-     return  (<div className="fixed inset-0 bg-slate-100 bg-opacity-50 flex items-center justify-center z-50">
+     return  (<div className="fixed inset-0 bg-slate-200 bg-opacity-80 flex items-center justify-center z-50">
      <div className="text-center">
-       <FaSpinner className="animate-spin text-4xl text-white mb-2" />
+       <FaSpinner className="animate-spin text-5xl text-white mb-2" />
      </div>
    </div>
      )

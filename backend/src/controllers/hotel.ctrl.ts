@@ -1,14 +1,16 @@
 import {Response,Request} from "express"
 import Hotel from "../models/hotel";
-import { BookingType, HotelSearchResponse, UserType } from "../types/types";
+import { BookingType, HotelSearchResponse } from "../types/types";
 import Stripe from "stripe"
 import mongoose from "mongoose";
 import User from "../models/user";
 import Wishlist from "../models/wishlist";
+import { generateFakeAddress } from "../helpers/fakeruserdatas";
+import { createAndSendInvoice } from "../helpers/PaymenyInvoice";
 
 
 
-const stripe=new Stripe(process.env.STRIPE_API_KEY as string)
+export const stripe=new Stripe(process.env.STRIPE_API_KEY as string)
 
 
 const GetSinglHotel = async(req:Request,res:Response) => {
@@ -82,10 +84,10 @@ const Searchhotel = async (req: Request, res: Response): Promise<void> => {
     res.status(500).json({ message: "Something went wrong" });
    }
   };
-
-
+  
 
   const StripePaymentIntent =async(req:Request,res:Response): Promise<void> => {
+
     const { numberOfNights } = req.body;
     
     const hotelId = req.params.hotelId;
@@ -103,11 +105,7 @@ const Searchhotel = async (req: Request, res: Response): Promise<void> => {
 
     const totalCost= hotel.pricePerNight * numberOfNights;
 
-    const addressline1:string="palathingal";
-    const addressline2:string="malappuram";
-    const addresscity:string="paarappanagadi";
-    const addresstate:string="kerala";
-    const addresspostcode:string="672547";
+     const {addresscity,addressline1,addressline2,addresspostcode,addresstate}=generateFakeAddress()
 
     const paymentIntent= await stripe.paymentIntents.create({
       amount: totalCost * 100,
@@ -141,11 +139,9 @@ const Searchhotel = async (req: Request, res: Response): Promise<void> => {
       totalCost
     };
 
-    res.send(response);
+    res.send(response); 
 
   };
-
-
 
 
   const BookTheHotel = async(req:Request,res:Response):Promise<void> => {
@@ -154,7 +150,8 @@ const Searchhotel = async (req: Request, res: Response): Promise<void> => {
     session.startTransaction();
 
     try {
-      const paymentIntentId = req.body.paymentIntentId;
+      const {paymentIntentId,numberOfNights}= req.body;
+          
       const paymentIntent = await stripe.paymentIntents.retrieve(paymentIntentId as string);
 
       if (!paymentIntent) {
@@ -213,8 +210,32 @@ const Searchhotel = async (req: Request, res: Response): Promise<void> => {
         return;
       }
 
+      const user = await User.findById(req.userId).session(session);
+      if (!user) {
+        await session.abortTransaction();
+        session.endSession();
+        res.status(400).json({ message: "User not found" });
+        return;
+      };
+
+      try {
+         await createAndSendInvoice({
+        user,
+        hotel,
+        bookingId: newBooking._id,
+        paymentintentId:paymentIntentId,
+        amount: totalCost,
+        numberOfNights
+      });
+        
+        await hotel.save({ session });
+    
+    } catch (invoiceError) {
+      console.error("Invoice creation failed:", invoiceError);
+    }
+
       await session.commitTransaction();
-      session.endSession();
+      session.endSession(); 
 
       res.status(200).send();
 
@@ -227,8 +248,7 @@ const Searchhotel = async (req: Request, res: Response): Promise<void> => {
   };
 
 
-
-  const constructSearchQuery= (queryParams:any) => {
+const constructSearchQuery= (queryParams:any) => {
     
     let constructedQuery: any = {};
 
@@ -367,34 +387,6 @@ const fetchAllWishlistByUser = async(req:Request,res:Response)=>{
 };
 
 
-const GetAlldatesStartToEnd =async(req:Request,res:Response): Promise<void> => {
-  try {
-    const hotelId = req.params.hotelId;
-
-    const hotel = await Hotel.findById(hotelId);
-    if (!hotel) {
-       res.status(404).json({ message: "Hotel not found" });
-       return;
-    };
-
-    const checkInDates = hotel.bookings.map(booking => booking.checkIn);
-    const checkOutDates = hotel.bookings.map(booking => booking.checkOut);
-
-    const earliestCheckIn = new Date(Math.min(...checkInDates.map(date => date.getTime())));
-    const latestCheckOut = new Date(Math.max(...checkOutDates.map(date => date.getTime())));
-
-    res.status(200).json({
-      earliestCheckIn,
-      latestCheckOut,
-    });
-    
-  } catch (error) {
-  res.status(500).json({ message: "Something went wrong" });
-  }
-};
-
-
-
 const checkDateAvailability = async (req: Request, res: Response): Promise<void> => {
   const { hotelId, checkIn, checkOut } = req.body;
 
@@ -483,6 +475,5 @@ export {
     AddToWishlist,
     removeFromWishlist,
     fetchAllWishlistByUser,
-    GetAlldatesStartToEnd,
     checkDateAvailability
 }

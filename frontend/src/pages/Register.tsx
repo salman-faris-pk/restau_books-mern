@@ -42,13 +42,28 @@ const Register = () => {
         reset();
         navigate('/');
       },
-      onError: (error: Error) => {
-        if(error.message === "Request failed with status code 400"){
-          showToast({message: "User already exists",type:"ERROR"})
-        }else{
-          showToast({message: error.message,type:"ERROR"})
-        }
-      },
+      onError: (error: any) => {
+        if (error.response) {
+          const status = error.response.status;
+          const message = error.response.data?.message || "An error occurred";
+          
+          switch (status) {
+            case 400:
+              showToast({ message: message || "User already exists", type: "ERROR" });
+              break;
+            case 401:
+              showToast({ message: message || "Invalid email address. Please provide a valid email.", type: "ERROR" });
+              break;
+            case 503:
+              showToast({ message: message || "Could not verify email at this time. Please try again later.", type: "ERROR" });
+              break;
+            default:
+              showToast({ message: message || "Something went wrong", type: "ERROR" });
+          }
+        } else {
+          showToast({ message: error.message || "An unexpected error occurred", type: "ERROR" });
+      }
+    }
     });
   
     const onSubmit = handleSubmit((data) => {
