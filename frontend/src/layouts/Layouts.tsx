@@ -8,6 +8,7 @@ import SearchBar from "../components/SearchBar";
 import MobNav from "../components/MobNav";
 import UpArrow from "../components/UpArrow";
 import { ScrollToTop } from "../utils/ScrollToTop";
+import { FaSpinner } from "react-icons/fa";
 
 const protectedRoutes = [
   "/add-hotel",
@@ -19,7 +20,7 @@ const protectedRoutes = [
 ];
 
 const MainLayout = () => {
-  const { isLoggedIn } = useAppContext();
+  const { isLoggedIn,isAuthLoading } = useAppContext();
   const location = useLocation();
 
   const isProtected = useMemo(
@@ -27,7 +28,14 @@ const MainLayout = () => {
     [location.pathname]
   );
 
-  if (isLoggedIn === undefined) return null;
+  if (isAuthLoading) {
+     return  (<div className="fixed inset-0 bg-slate-100 bg-opacity-50 flex items-center justify-center z-50">
+     <div className="text-center">
+       <FaSpinner className="animate-spin text-4xl text-white mb-2" />
+     </div>
+   </div>
+     )
+   };
 
   if (!isLoggedIn && isProtected) {
     return <Navigate to="/sign-in" state={{ from: location }} replace />;

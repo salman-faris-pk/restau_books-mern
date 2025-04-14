@@ -19,6 +19,7 @@ type AppContext={
     isLoggedIn: boolean;
     stripePromise: Promise<Stripe | null>;
     loginuserId: string | null;
+    isAuthLoading: boolean;
 };
 
 const AppContext=createContext<AppContext | undefined>(undefined)
@@ -36,7 +37,8 @@ export const AppContextProvider=({children}: {children: React.ReactNode})=>{
       });
 
       const loginuserId = data?.userId || null;
-      const isLoggedInn = !isLoading && !isError
+      // const isLoggedInn = !isLoading && !isError
+      const isLoggedInn = !isError && !!data;
       
     return(
         <AppContext.Provider value={{
@@ -45,7 +47,8 @@ export const AppContextProvider=({children}: {children: React.ReactNode})=>{
             },
             isLoggedIn: isLoggedInn,
             stripePromise,
-            loginuserId:loginuserId
+            loginuserId:loginuserId,
+            isAuthLoading:isLoading
           }}>
           
           {toast && (

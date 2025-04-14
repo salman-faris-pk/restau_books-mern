@@ -367,7 +367,7 @@ const fetchAllWishlistByUser = async(req:Request,res:Response)=>{
 };
 
 
-const GetAlldatesStartToEnd =async(req:Request,res:Response): Promise<void>=>{
+const GetAlldatesStartToEnd =async(req:Request,res:Response): Promise<void> => {
   try {
     const hotelId = req.params.hotelId;
 
@@ -395,6 +395,84 @@ const GetAlldatesStartToEnd =async(req:Request,res:Response): Promise<void>=>{
 
 
 
+const checkDateAvailability = async (req: Request, res: Response): Promise<void> => {
+  const { hotelId, checkIn, checkOut } = req.body;
+
+  if (!hotelId || !checkIn || !checkOut) {
+    res.status(400).json({
+      success: false,
+      message: "hotelId, checkIn, and checkOut are required"
+    });
+    return;
+  }
+
+  try {
+    const newCheckIn = new Date(checkIn);
+    const newCheckOut = new Date(checkOut);
+
+    if (newCheckIn >= newCheckOut) {
+      res.status(400).json({
+        success: false,
+        message: "Check-out date must be after check-in date"
+      });
+      return;
+    }
+
+    const hotel = await Hotel.findById(hotelId).select("bookings");
+    if (!hotel) {
+      res.status(404).json({
+        success: false,
+        message: "Hotel not found"
+      });
+      return;
+    }
+
+    let conflictMessage = "";
+    const hasConflict = hotel.bookings.some(booking => {
+      const existingCheckIn = new Date(booking.checkIn);
+      const existingCheckOut = new Date(booking.checkOut);
+
+      if (newCheckIn >= existingCheckIn && newCheckIn < existingCheckOut) {
+        conflictMessage = `Check-in date conflicts with an existing booking (${existingCheckIn.toDateString()} to ${existingCheckOut.toDateString()})`;
+        return true;
+      }
+
+      if (newCheckOut > existingCheckIn && newCheckOut <= existingCheckOut) {
+        conflictMessage = `Check-out date conflicts with an existing booking (${existingCheckIn.toDateString()} to ${existingCheckOut.toDateString()})`;
+        return true;
+      }
+
+      if (newCheckIn <= existingCheckIn && newCheckOut >= existingCheckOut) {
+        conflictMessage = `Selected dates include already booked period (${existingCheckIn.toDateString()} to ${existingCheckOut.toDateString()})`;
+        return true;
+      }
+
+      return false;
+    });
+
+    if (hasConflict) {
+      res.status(200).json({
+        success: false,
+        message: conflictMessage
+      });
+      return;
+    }
+
+    res.status(200).json({
+      success: true,
+      message: "Dates are available for booking"
+    });
+
+  } catch (error) {
+    console.error("Date availability check failed:", error);
+    res.status(500).json({
+      success: false,
+      message: "Failed to check date availability"
+    });
+  }
+};
+
+
 export {
     Searchhotel,
     GetSinglHotel,
@@ -405,5 +483,6 @@ export {
     AddToWishlist,
     removeFromWishlist,
     fetchAllWishlistByUser,
-    GetAlldatesStartToEnd
+    GetAlldatesStartToEnd,
+    checkDateAvailability
 }

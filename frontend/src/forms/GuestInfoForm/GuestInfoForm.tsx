@@ -6,7 +6,7 @@ import DatePicker from 'react-datepicker';
 import { useQuery } from "@tanstack/react-query";
 import * as apiClient from "../../api/api-client"
 import { getDisabledDates } from "../../utils/DisableDates";
-import { useEffect } from "react";
+import { useState } from "react";
 
 
 
@@ -29,33 +29,24 @@ const GuestInfoForm = ({ hotelId, pricePerNight,hotelUserId }: Props) => {
     const navigate = useNavigate();
     const location = useLocation();
     const { isLoggedIn,showToast} = useAppContext();
+    const [isCheckingAvailability, setIsCheckingAvailability] = useState(false);
 
     const {data: dates}=useQuery({
       queryKey:["fetchDates",hotelId],
       queryFn: ()=> apiClient.getDates(hotelId),
       enabled: !!hotelId
     });
-
+     
 
     const {register,watch,setValue,handleSubmit,reset,formState: { errors }}=useForm<GuestInfoFormData>({
       defaultValues: {
-        checkIn: dates?.latestCheckOut && new Date(dates.latestCheckOut) >= new Date()
-      ? new Date(dates.latestCheckOut)
-      : search.checkIn,
+        checkIn: search.checkIn,
         checkOut: search.checkOut,
         adultCount: search.adultCount,
         childCount: search.childCount,
       },
     });
 
-    useEffect(() => {
-      if (dates?.latestCheckOut && new Date(dates.latestCheckOut) >= new Date()) {
-        reset((prevValues) => ({
-          ...prevValues,
-          checkIn: new Date(dates.latestCheckOut),
-        }));
-      }
-    }, [dates?.latestCheckOut, reset]);
 
     const checkIn = watch("checkIn");
     const checkOut = watch("checkOut");
@@ -71,24 +62,56 @@ const GuestInfoForm = ({ hotelId, pricePerNight,hotelUserId }: Props) => {
       navigate("/sign-in", { state: { from: location } });
     };
 
-    const onSubmit = (data: GuestInfoFormData) => {
+    const onSubmit = async (data: GuestInfoFormData) => {
+       setIsCheckingAvailability(true);
+
       if (data.checkOut.getTime() < data.checkIn.getTime()) {
         showToast({ message: "Check-out must be after check-in", type: "ERROR" });
+        setIsCheckingAvailability(false)
+
         return;
       } else if (data.checkOut.getTime() === data.checkIn.getTime()) {
         showToast({ message: "Check-in and Check-out dates are the same", type: "ERROR" });
+        setIsCheckingAvailability(false)
         return;
-      };
+      }
+       
+      try {
+        const availability = await apiClient.checkAvailability(
+          hotelId,
+          data.checkIn,
+          data.checkOut
+        );
     
-      search.saveSearchValues(
-        "",
-        data.checkIn,
-        data.checkOut,
-        data.adultCount,
-        data.childCount
-      );
-      navigate(`/hotel/${hotelId}/booking`);
+        if (availability.success !== true) {
+          showToast({ 
+            message: availability.message, 
+            type: "ERROR" 
+          });
+         setIsCheckingAvailability(false)
+          return;
+        }
+
+    
+        search.saveSearchValues(
+          "",
+          data.checkIn,
+          data.checkOut,
+          data.adultCount,
+          data.childCount
+        );
+        navigate(`/hotel/${hotelId}/booking`);
+    
+      } catch (error) {
+        showToast({ 
+          message: "Error checking availability. Please try again.", 
+          type: "ERROR" 
+        });
+      }finally{
+        setIsCheckingAvailability(false);
+      }
     };
+    
   
     const minDate = new Date();
     const maxDate = new Date();
@@ -109,7 +132,7 @@ const GuestInfoForm = ({ hotelId, pricePerNight,hotelUserId }: Props) => {
         e.preventDefault();
         
         reset({
-          checkIn: dates?.latestCheckOut ? new Date(dates?.latestCheckOut) : search.checkIn,
+          checkIn: search.checkIn,
           checkOut: search.checkOut,
           adultCount: search.adultCount,
           childCount: search.childCount,
@@ -212,7 +235,7 @@ const GuestInfoForm = ({ hotelId, pricePerNight,hotelUserId }: Props) => {
         sameUser ? "cursor-not-allowed opacity-50" : "cursor-pointer"
       } bg-blue-600 text-white h-full p-2 font-bold hover:bg-blue-500 text-xl w-full rounded-sm`}
       >
-      Book Now
+      {isCheckingAvailability ? "checking dates availability" : "Book Now"}
     </button>
     {sameUser && (
       <p className="text-red-500 text-xs mt-2">You cannot book your own hotel.</p>

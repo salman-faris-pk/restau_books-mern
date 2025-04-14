@@ -1,5 +1,6 @@
 import express from "express";
-import { Searchhotel,GetSinglHotel,StripePaymentIntent,GetAlldatesStartToEnd,fetchAllWishlistByUser,BookTheHotel,getLatesthotels,AddToWishlist,isHotelInWishlist,removeFromWishlist} from "../controllers/hotel.ctrl"
+import { Searchhotel,GetSinglHotel,StripePaymentIntent,GetAlldatesStartToEnd,fetchAllWishlistByUser,BookTheHotel,getLatesthotels,AddToWishlist,
+        isHotelInWishlist,removeFromWishlist,checkDateAvailability} from "../controllers/hotel.ctrl"
 import { param } from "express-validator";
 import { validateRequest } from "../middlewares/validateMiddleware";
 import verifyToken from "../middlewares/auth";
@@ -18,7 +19,7 @@ router.delete("/wishlist/:hotelId",verifyToken,removeFromWishlist)
 router.get("/:id",[param("id").notEmpty().withMessage("hotel Id is required")],validateRequest,GetSinglHotel)
 router.post("/:hotelId/bookings",verifyToken,BookTheHotel)
 router.post("/:hotelId/bookings/payment-intent",verifyToken,StripePaymentIntent)
-
+router.post("/availability",verifyToken,checkDateAvailability);
 
 
 export default router;

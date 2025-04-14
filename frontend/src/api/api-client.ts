@@ -290,3 +290,16 @@ export const getDates=async(hotelId:string)=> {
   return response.data;
 
 };
+
+
+export const checkAvailability=async(hotelId: string,checkIn: Date,checkOut: Date)=>{
+  const response=await axiosInstance.post('/hotels//availability',{
+    hotelId,
+    checkIn,
+    checkOut,
+  });
+  if(response.status !== 200){
+    throw new Error("error checking availability dates");
+  };
+  return response.data;
+}
