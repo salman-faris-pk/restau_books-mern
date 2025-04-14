@@ -44,7 +44,6 @@ app.use("/api/hotels",hotelRoutes)
 app.use("/api/my-bookings",bookingRoutes)
 
 
-
 app.get("*", (req: Request, res: Response) => {
   res.sendFile(path.join(__dirname, "../../frontend/dist/index.html"));
 });
