@@ -303,3 +303,17 @@ export const checkAvailability=async(hotelId: string,checkIn: Date,checkOut: Dat
   };
   return response.data;
 }
+
+
+export const cancelBooking = async (hotelId: string, paymentIntentId: string) => {
+  try {
+    const response = await axiosInstance.post(`/hotels/cancel/${hotelId}`, {
+      paymentIntentId,
+    });
+
+    return response.data;
+  } catch (error: any) {
+    const message = error.response?.data?.message || "Something went wrong";
+    throw new Error(message);
+  }
+};

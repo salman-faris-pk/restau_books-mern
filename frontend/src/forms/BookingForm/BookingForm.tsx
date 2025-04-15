@@ -51,7 +51,13 @@ const BookingForm = ({currentUser,paymentIntent,numberOfNights}:Props) => {
    mutationFn: apiClient.createRoomBooking,
    onSuccess: () => {
     queryClient.invalidateQueries({ queryKey: ["fetchMyBookings"] });
-     showToast({message:"Booking Saved!", type: "SUCCESS"});
+     showToast({message:"Booking Saved!", type: "SUCCESS",duration:4000});
+     setIsModalOpen(true);
+     setTimeout(() => {
+      setIsModalOpen(false);
+      navigate("/", { replace: true });
+      navigate("/my-bookings");
+    }, 3000);
    },
    onError: () => {
     showToast({ message: "Error saving booking", type: "ERROR" });
@@ -98,13 +104,6 @@ const BookingForm = ({currentUser,paymentIntent,numberOfNights}:Props) => {
 
      if(result.paymentIntent?.status === "succeeded") {
        bookRoom({...formData, paymentIntentId: result.paymentIntent.id});
-       setLoading(false)
-       setIsModalOpen(true);
-       setTimeout(() => {
-         setIsModalOpen(false); 
-         navigate("/", { replace: true });
-         navigate("/my-bookings");
-       }, 4000);
      };
 
   };

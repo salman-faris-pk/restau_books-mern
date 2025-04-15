@@ -78,7 +78,8 @@ const GuestInfoForm = ({ hotelId, pricePerNight,hotelUserId }: Props) => {
         if (availability.success !== true) {
           showToast({ 
             message: availability.message, 
-            type: "ERROR" 
+            type: "ERROR",
+            duration: 4000
           });
          setIsCheckingAvailability(false)
           return;

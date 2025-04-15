@@ -7,11 +7,10 @@ import User from "../models/user";
 import Wishlist from "../models/wishlist";
 import { generateFakeAddress } from "../helpers/fakeruserdatas";
 import { createAndSendInvoice } from "../helpers/PaymenyInvoice";
-
-
+import { CancellationInvoice } from "../helpers/cancelInvoice"
+import calculateNights from "../helpers/calculateNights"
 
 export const stripe=new Stripe(process.env.STRIPE_API_KEY as string)
-
 
 const GetSinglHotel = async(req:Request,res:Response) => {
 
@@ -151,6 +150,7 @@ const Searchhotel = async (req: Request, res: Response): Promise<void> => {
 
     try {
       const {paymentIntentId,numberOfNights}= req.body;
+      const hotelId=req.params.hotelId;
           
       const paymentIntent = await stripe.paymentIntents.retrieve(paymentIntentId as string);
 
@@ -175,14 +175,17 @@ const Searchhotel = async (req: Request, res: Response): Promise<void> => {
         res.status(400).json({message: `payment intent not succeeded. Status: ${paymentIntent.status}`})
         return;
       };
-
+      
+      const newBookingId = new mongoose.Types.ObjectId();
       const newBooking:BookingType = {
         ...req.body,
         userId: req.userId,
+        _id:newBookingId,
+        hotelId,
       };
 
       const hotel = await Hotel.findOneAndUpdate(
-        { _id: req.params.hotelId },
+        { _id: hotelId },
         {
           $push: { bookings: newBooking },
         },
@@ -217,7 +220,7 @@ const Searchhotel = async (req: Request, res: Response): Promise<void> => {
         res.status(400).json({ message: "User not found" });
         return;
       };
-
+             
       try {
          await createAndSendInvoice({
         user,
@@ -246,6 +249,110 @@ const Searchhotel = async (req: Request, res: Response): Promise<void> => {
       res.status(500).json({ message: "something went wrong" });
     }
   };
+
+
+  const CancelBooking = async (req: Request, res: Response): Promise<void> => {
+    const session = await mongoose.startSession();
+    session.startTransaction();
+
+    try {
+        const { paymentIntentId } = req.body;
+        const hotelId = req.params.hotelId;
+        const userId = req.userId;
+
+        const paymentIntent = await stripe.paymentIntents.retrieve(paymentIntentId as string);
+        
+        if (!paymentIntent) {
+            await session.abortTransaction(); 
+            session.endSession();
+            res.status(400).json({ message: "Payment intent not found" });
+            return;
+        }
+
+        if (paymentIntent.metadata.hotelId !== hotelId || paymentIntent.metadata.userId !== userId) {
+            await session.abortTransaction();
+            session.endSession();
+            res.status(400).json({ message: "Payment intent mismatch" });
+            return;
+        }
+
+        if (paymentIntent.status === "succeeded") {
+            await stripe.refunds.create({
+                payment_intent: paymentIntentId as string,
+            });
+        }
+
+        const hotel = await Hotel.findById(hotelId).session(session);
+        if (!hotel) {
+            await session.abortTransaction();
+            session.endSession();
+            res.status(400).json({ message: "Hotel not found" });
+            return;
+        }
+
+        const bookingIndex = hotel.bookings.findIndex(
+            (booking) => booking.paymentIntentId === paymentIntentId
+        );
+
+        if (bookingIndex === -1) {
+            await session.abortTransaction();
+            session.endSession();
+            res.status(400).json({ message: "Booking not found" });
+            return;
+        }
+
+        hotel.bookings[bookingIndex].isCancelled = true;
+        
+        await hotel.save({ session });
+
+        const booking = hotel.bookings[bookingIndex];
+        const totalCost = booking.totalCost;
+
+        await User.findOneAndUpdate(
+            { _id: hotel.userId },
+            { $inc: { earned: -totalCost } },
+            { session }
+        );
+
+        const user = await User.findById(userId).session(session);
+        if (!user) {
+            await session.abortTransaction();
+            session.endSession();
+            res.status(400).json({ message: "User not found" });
+            return;
+        }
+        
+        try {
+            await CancellationInvoice({
+                user,
+                hotel: {
+                    _id: hotel._id,
+                    name: hotel.name
+                },
+                bookingId: booking._id.toString(),
+                paymentintentId: paymentIntentId,
+                amount: totalCost,
+                numberOfNights: calculateNights(booking.checkIn, booking.checkOut)
+            });
+        } catch (invoiceError) {
+            console.error("Cancellation invoice failed:", invoiceError);
+        }
+
+        await session.commitTransaction();
+        session.endSession();
+
+        res.status(200).json({ 
+            message: "Booking cancelled and check gmail for more details",
+            isCancelled: true
+        });
+    } catch (error) {
+        await session.abortTransaction();
+        session.endSession();
+        console.error("Error cancelling booking:", error);
+        res.status(500).json({ message: "Something went wrong" });
+    }
+};
+
 
 
 const constructSearchQuery= (queryParams:any) => {
@@ -475,5 +582,6 @@ export {
     AddToWishlist,
     removeFromWishlist,
     fetchAllWishlistByUser,
-    checkDateAvailability
+    checkDateAvailability,
+    CancelBooking
 }

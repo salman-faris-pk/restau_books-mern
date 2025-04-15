@@ -47,8 +47,9 @@ const Booking = () => {
 
 
   if (!hotel) {
-    return <></>;
+    return <>no hotels found</>;
   };
+  
   if (isLoading) {
     return (
     <div className="flex justify-center items-center">
@@ -67,7 +68,7 @@ const Booking = () => {
          adultCount={search.adultCount}
          childCount={search.childCount}
          numberOfNights={numberOfNights}
-         hotel={hotel}
+        hotel={hotel}
       />
       {currentUser && paymentIntentData && (
         <Elements 

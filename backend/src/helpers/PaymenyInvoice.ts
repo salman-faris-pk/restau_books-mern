@@ -7,7 +7,7 @@ import nodemailer from "nodemailer"
 interface CreateInvoiceParams {
   user: Omit<UserType, 'password' | 'earned'>;
   hotel: Pick<HotelType, '_id' | 'name'>;
-  bookingId: string;
+  bookingId: string | number;
   paymentintentId: string;
   amount: number;
   numberOfNights: number | string;

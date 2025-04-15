@@ -27,7 +27,7 @@ export type UserType = {
   };
   
   export type BookingType = {
-    _id: string;
+    _id: string | number;
     userId: string;
     firstName: string;
     lastName: string;
@@ -35,10 +35,11 @@ export type UserType = {
     adultCount: number;
     childCount: number;
     checkIn: Date;
+    hotelId:string;
     checkOut: Date;
     totalCost: number;
     paymentIntentId: string;
-    invoiceId:string;
+    isCancelled: boolean;
   };
 
 

@@ -12,6 +12,7 @@ const STRIPE_PUB_KEY = import.meta.env.VITE_STRIPE_PUB_KEY || "";
 type ToastMessage={
     message: string;
     type: "SUCCESS" | "ERROR",
+    duration? : number,
 }
 
 type AppContext={
@@ -37,7 +38,6 @@ export const AppContextProvider=({children}: {children: React.ReactNode})=>{
       });
 
       const loginuserId = data?.userId || null;
-      // const isLoggedInn = !isLoading && !isError
       const isLoggedInn = !isError && !!data;
       
     return(
