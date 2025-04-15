@@ -51,9 +51,7 @@ const BookingForm = ({currentUser,paymentIntent,numberOfNights}:Props) => {
    mutationFn: apiClient.createRoomBooking,
    onSuccess: () => {
     queryClient.invalidateQueries({ queryKey: ["fetchMyBookings"] });
-    setTimeout(()=>{
      showToast({message:"Booking Saved!", type: "SUCCESS"});
-    },3000)
    },
    onError: () => {
     showToast({ message: "Error saving booking", type: "ERROR" });
@@ -106,7 +104,7 @@ const BookingForm = ({currentUser,paymentIntent,numberOfNights}:Props) => {
          setIsModalOpen(false); 
          navigate("/", { replace: true });
          navigate("/my-bookings");
-       }, 5000);
+       }, 4000);
      };
 
   };
