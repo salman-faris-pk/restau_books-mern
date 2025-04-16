@@ -5,9 +5,10 @@ import { useParams } from "react-router-dom";
 import GuestInfoForm from "../forms/GuestInfoForm/GuestInfoForm";
 import { CiBookmark } from "react-icons/ci";
 import { IoBookmark } from "react-icons/io5";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useAppContext } from "../contexts/AppContext";
 import { useOptimistic } from 'react';
+import Skeleton from "../components/Skeleton";
 
 
 const Detail = () => {
@@ -16,8 +17,6 @@ const Detail = () => {
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const { showToast, isLoggedIn,loginuserId } = useAppContext();
   
-
-
   const { data: CurrentStatus} = useQuery({
     queryKey: ["fetchStatus", hotelId],
     queryFn: () => apiClient.WishListStatus(hotelId as string),
@@ -25,13 +24,14 @@ const Detail = () => {
     refetchOnWindowFocus: false,
   });
 
-  const { data: hotel } = useQuery({
+  const { data: hotel,isLoading } = useQuery({
     queryKey: ["fetchHotelById", hotelId],
     queryFn: () => apiClient.fetchHotelbyId(hotelId as string),
     enabled: !!hotelId,
+    staleTime: 10 * 60 * 1000,
   });
 
-const trimmedLoginUserId = loginuserId?.trim();
+const trimmedLoginUserId = loginuserId?.trim(); 
 const trimmedHotelUserId = hotel?.userId?.trim();
 
 const isUserHotelOwner = trimmedLoginUserId === trimmedHotelUserId;
@@ -68,6 +68,23 @@ const isUserHotelOwner = trimmedLoginUserId === trimmedHotelUserId;
       showToast({ message: "Failed to remove from wishlist!", type: "ERROR" });
     },
   });
+
+  useEffect(() => {
+    if (selectedImage) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'auto';
+    }
+    return () => {
+      document.body.style.overflow = 'auto';
+    };
+  }, [selectedImage]);
+
+  if (isLoading) {
+    return (
+      <Skeleton/>
+    );
+  }
 
   if (!hotel) {
     return <></>;
@@ -117,9 +134,9 @@ const isUserHotelOwner = trimmedLoginUserId === trimmedHotelUserId;
 
       {selectedImage && (
         <div
-          className="fixed inset-0 bg-black bg-opacity-90 h-full flex items-center justify-center z-50 p-4"
+          className="fixed inset-0 bg-black/80 bg-opacity-90 h-full flex items-center justify-center z-50 p-4"
         >
-          <div className="relative max-w-full max-h-full">
+          <div className="relative max-w-full max-h-full" onClick={(e) => e.stopPropagation()} >
             <img
               src={selectedImage}
               alt={hotel.name}

@@ -16,11 +16,12 @@ import cloudinaryConfig from "./config/cloudinary";
 const port=process.env.PORT || 7000;
 
 const limiter = rateLimit({
-  windowMs: 7 * 60 * 1000,
-  max: 100
+  windowMs: 5 * 60 * 1000,
+  max: 120
 });
 
 CronJob.start();
+
 
 cloudinaryConfig();
 

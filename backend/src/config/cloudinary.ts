@@ -15,6 +15,7 @@ const cloudinaryConfig = () => {
     secure: true,
   });
 
+
   return cloudinary;
 };
 

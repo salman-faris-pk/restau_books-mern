@@ -6,7 +6,7 @@ export const validateRequest = (req: Request, res: Response, next: NextFunction)
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     res.status(400).json({ message: errors.array() });
-    return;  //Stops further execution, preventing next middleware
+    return;
   }
   next(); 
 };
