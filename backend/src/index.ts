@@ -16,11 +16,11 @@ import cloudinaryConfig from "./config/cloudinary";
 const port=process.env.PORT || 7000;
 
 const limiter = rateLimit({
-  windowMs: 5 * 60 * 1000,
-  max: 120
+  windowMs: 60 * 1000,
+  max: 100
 });
 
-// CronJob.start();
+CronJob.start();
 
 
 cloudinaryConfig();
@@ -39,7 +39,7 @@ app.use(cors({
 
 app.use(express.static(path.join(__dirname, "../../frontend/dist")));
 
-app.use("/api/user", userRoutes);
+app.use("/api/user",userRoutes);
 app.use("/api/my-hotels",myHotelRoutes)
 app.use("/api/hotels",hotelRoutes)
 app.use("/api/my-bookings",bookingRoutes)
