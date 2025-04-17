@@ -34,7 +34,7 @@ const SignIn = () => {
           showToast({message:"Sign in Successful!", type: "SUCCESS"});
           await queryClient.invalidateQueries({ queryKey: ["validateToken"]})
           reset();
-          navigate(location.state?.from?.pathname || '/');
+          navigate(location.state?.from?.pathname || '/' , {replace: true});
         },
         onError: (error: Error) => {
           if(error.message === "Request failed with status code 400"){

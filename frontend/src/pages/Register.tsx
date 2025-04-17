@@ -40,7 +40,7 @@ const Register = () => {
         showToast({message:"Registration Success!", type: "SUCCESS"});
         await queryClient.invalidateQueries({ queryKey: ["validateToken"]})
         reset();
-        navigate('/');
+        navigate('/', {replace: true});
       },
       onError: (error: any) => {
         if (error.response) {

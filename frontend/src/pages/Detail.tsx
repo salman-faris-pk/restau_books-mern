@@ -64,6 +64,7 @@ const Detail = () => {
     },
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: ["fetchStatus", hotelId] }); //Always refetch after error or success
+      queryClient.invalidateQueries({ queryKey: ["wishlist"] });
     },
   });
 

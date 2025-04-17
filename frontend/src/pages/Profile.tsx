@@ -50,6 +50,7 @@ const Profile = () => {
     onError: (error: Error) => {
       showToast({ message: error.message || "Failed to remove from wishlist!", type: "ERROR" });
       queryClient.invalidateQueries({ queryKey: ["wishlist"] });
+      queryClient.invalidateQueries({ queryKey: ["fetchStatus"] });
     },
   });
 
