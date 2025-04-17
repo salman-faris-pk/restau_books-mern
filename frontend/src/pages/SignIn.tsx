@@ -20,7 +20,8 @@ const SignIn = () => {
      const queryClient = useQueryClient();
      const location = useLocation();
      const navigate = useNavigate();
-
+     
+    
   const {
     register,
     formState: { errors },
@@ -34,7 +35,7 @@ const SignIn = () => {
           showToast({message:"Sign in Successful!", type: "SUCCESS"});
           await queryClient.invalidateQueries({ queryKey: ["validateToken"]})
           reset();
-          navigate(location.state?.from?.pathname || '/' , {replace: true});
+          navigate(location.state?.from || '/' , { replace: true });
         },
         onError: (error: Error) => {
           if(error.message === "Request failed with status code 400"){

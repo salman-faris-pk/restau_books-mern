@@ -1,10 +1,10 @@
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import SignOutButton from "./SignOutButton";
 import { useAppContext } from "../contexts/AppContext";
 
 
 const Header = () => {
-
+  const location = useLocation();
   const { isLoggedIn } = useAppContext();
 
   return (
@@ -41,7 +41,7 @@ const Header = () => {
             </>
           ) : (
             <Link
-              to="/sign-in"
+              to="/sign-in"  state={{ from: location.pathname }}
               className="flex bg-white items-center text-sm text-blue-600 px-3 font-bold hover:bg-gray-100 rounded-sm"
             >
               Sign In

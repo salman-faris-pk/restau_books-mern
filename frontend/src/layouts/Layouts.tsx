@@ -22,7 +22,7 @@ const protectedRoutes = [
 const MainLayout = () => {
   const { isLoggedIn,isAuthLoading } = useAppContext();
   const location = useLocation();
-
+  
   const isProtected = useMemo(
     () => protectedRoutes.some((route) => location.pathname.startsWith(route)),
     [location.pathname]
@@ -37,10 +37,10 @@ const MainLayout = () => {
      )
    };
 
-
-  if (!isLoggedIn && isProtected) {
-    return <Navigate to="/sign-in" state={{ from: location }} replace />;
-  }
+    if (!isLoggedIn && isProtected) {
+      return <Navigate to="/sign-in" state={{ from: location.pathname }} replace />;
+    };
+  
 
   return (
     <div className="flex flex-col min-h-screen">
