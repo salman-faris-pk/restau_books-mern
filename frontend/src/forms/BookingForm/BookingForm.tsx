@@ -50,6 +50,7 @@ const BookingForm = ({currentUser,paymentIntent,numberOfNights}:Props) => {
   const {mutate: bookRoom}=useMutation({
    mutationFn: apiClient.createRoomBooking,
    onSuccess: () => {
+    queryClient.invalidateQueries({queryKey:["fetchlatest"]})
     queryClient.invalidateQueries({ queryKey: ["fetchMyBookings"] });
      showToast({message:"Booking Saved!", type: "SUCCESS",duration:4000});
      setIsModalOpen(true);

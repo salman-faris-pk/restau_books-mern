@@ -20,7 +20,7 @@ const limiter = rateLimit({
   max: 120
 });
 
-CronJob.start();
+// CronJob.start();
 
 
 cloudinaryConfig();

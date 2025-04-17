@@ -37,6 +37,7 @@ const MainLayout = () => {
      )
    };
 
+
   if (!isLoggedIn && isProtected) {
     return <Navigate to="/sign-in" state={{ from: location }} replace />;
   }

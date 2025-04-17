@@ -32,7 +32,6 @@ const Profile = () => {
     queryKey: ["userprofile"],
     queryFn: apiClient.userProfile,
     refetchOnWindowFocus: false,
-    staleTime: 1000 * 60 * 5,
   });
 
   const { data: wishlist } = useQuery({
@@ -42,19 +41,22 @@ const Profile = () => {
 
   const { mutate: removeFromWishlist } = useMutation({
     mutationFn: (hotelId: string) => apiClient.removeWishlist(hotelId),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["wishlist"] });
+    onSuccess: (_, hotelId) => {
+      queryClient.setQueryData<WishlistItem[]>(["wishlist"], (prevData) => {
+        return prevData?.filter(item => item.hotelId._id !== hotelId) || [];
+      });
       showToast({ message: "Removed from wishlist", type: "SUCCESS" });
     },
-    onError: () => {
-      showToast({ message: "Failed to remove from wishlist!", type: "ERROR" });
+    onError: (error: Error) => {
+      showToast({ message: error.message || "Failed to remove from wishlist!", type: "ERROR" });
+      queryClient.invalidateQueries({ queryKey: ["wishlist"] });
     },
   });
 
   const mutation = useMutation({
     mutationFn: apiClient.SignOut,
     onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: ["validateToken"] });
+      await queryClient.invalidateQueries({ queryKey: ["validateToken"] });      
       showToast({ message: "Signed Out!", type: "SUCCESS" });
     },
     onError: (error: Error) => {

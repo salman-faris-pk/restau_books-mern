@@ -7,65 +7,63 @@ import { CiBookmark } from "react-icons/ci";
 import { IoBookmark } from "react-icons/io5";
 import { useEffect, useState } from "react";
 import { useAppContext } from "../contexts/AppContext";
-import { useOptimistic } from 'react';
 import Skeleton from "../components/Skeleton";
-
 
 const Detail = () => {
   const queryClient = useQueryClient();
   const { hotelId } = useParams();
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
-  const { showToast, isLoggedIn,loginuserId } = useAppContext();
+  const { showToast, isLoggedIn, loginuserId } = useAppContext();
   
-  const { data: CurrentStatus} = useQuery({
+  const { data: currentStatus } = useQuery({
     queryKey: ["fetchStatus", hotelId],
     queryFn: () => apiClient.WishListStatus(hotelId as string),
     enabled: !!hotelId,
     refetchOnWindowFocus: false,
   });
 
-  const { data: hotel,isLoading } = useQuery({
+  const { data: hotel, isLoading } = useQuery({
     queryKey: ["fetchHotelById", hotelId],
     queryFn: () => apiClient.fetchHotelbyId(hotelId as string),
     enabled: !!hotelId,
-    staleTime: 10 * 60 * 1000,
+    staleTime: 15 * 60 * 1000,
   });
 
-const trimmedLoginUserId = loginuserId?.trim(); 
-const trimmedHotelUserId = hotel?.userId?.trim();
+  const trimmedLoginUserId = loginuserId?.trim(); 
+  const trimmedHotelUserId = hotel?.userId?.trim();
+  const isUserHotelOwner = trimmedLoginUserId === trimmedHotelUserId;
 
-const isUserHotelOwner = trimmedLoginUserId === trimmedHotelUserId;
+  const { mutate: toggleWishlist } = useMutation({
+    mutationFn: async () => {
+      if (currentStatus?.inWishlist) {
+        return await apiClient.removeWishlist(hotelId as string);
+      } else {
+        return await apiClient.AddToWishlist(hotelId as string);
+      }
+    },
+    onMutate: async () => {
 
-  const [optimisticStatus, setOptimisticStatus] = useOptimistic(
-    CurrentStatus?.inWishlist || false,
-    (_, newStatus) => newStatus
-  );
+      await queryClient.cancelQueries({ queryKey: ["fetchStatus", hotelId] });
 
-  const { mutate: addToWishlist } = useMutation({
-    mutationFn: () => apiClient.AddToWishlist(hotelId as string),
-    onMutate: () => {
-      setOptimisticStatus(true);
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["fetchStatus"] });
-    },
-    onError: () => {
-      setOptimisticStatus(false);
-      showToast({ message: "Failed to add to wishlist!", type: "ERROR" });
-    },
-  });
+      const previousStatus = queryClient.getQueryData(["fetchStatus", hotelId]);
 
-  const { mutate: removeFromWishlist } = useMutation({
-    mutationFn: () => apiClient.removeWishlist(hotelId as string),
-    onMutate: () => {
-      setOptimisticStatus(false);
+      queryClient.setQueryData(["fetchStatus", hotelId], (old: any) => ({
+        ...old,
+        inWishlist: !old?.inWishlist,
+      }));
+
+      return { previousStatus };
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["fetchStatus"] });
+    onError: (err, _, context) => {
+      queryClient.setQueryData(["fetchStatus", hotelId], context?.previousStatus);
+      showToast({ 
+        message: `Failed to ${currentStatus?.inWishlist ? "remove from" : "add to"} wishlist!`, 
+        type: "ERROR" 
+      });
+      console.error(err);
     },
-    onError: () => {
-      setOptimisticStatus(true);
-      showToast({ message: "Failed to remove from wishlist!", type: "ERROR" });
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ["fetchStatus", hotelId] }); //Always refetch after error or success
     },
   });
 
@@ -81,14 +79,12 @@ const isUserHotelOwner = trimmedLoginUserId === trimmedHotelUserId;
   }, [selectedImage]);
 
   if (isLoading) {
-    return (
-      <Skeleton/>
-    );
+    return <Skeleton />;
   }
 
   if (!hotel) {
     return <></>;
-  };
+  }
 
   return (
     <div className="space-y-6 px-2 md:px-0">
@@ -100,12 +96,20 @@ const isUserHotelOwner = trimmedLoginUserId === trimmedHotelUserId;
         </span>
         <div className="flex justify-between cursor-pointer">
           <h1 className="text-3xl font-bold">{hotel.name}</h1>
-          {isLoggedIn && hotel?.userId &&  (
-            <span  className={`${isUserHotelOwner ? "hidden" : "block"}`}>
-              {optimisticStatus ? (
-                <IoBookmark size={42} onClick={() => removeFromWishlist()} />
+          {isLoggedIn && hotel?.userId && (
+            <span className={`${isUserHotelOwner ? "hidden" : "block"}`}>
+              {currentStatus?.inWishlist ? (
+                <IoBookmark 
+                  size={42} 
+                  onClick={() => toggleWishlist()} 
+                  className="text-blue-500 hover:text-blue-700 transition-colors"
+                />
               ) : (
-                <CiBookmark size={42} onClick={() => addToWishlist()} />
+                <CiBookmark 
+                  size={42} 
+                  onClick={() => toggleWishlist()} 
+                  className="hover:text-blue-500 transition-colors"
+                />
               )}
             </span>
           )}
@@ -135,8 +139,9 @@ const isUserHotelOwner = trimmedLoginUserId === trimmedHotelUserId;
       {selectedImage && (
         <div
           className="fixed inset-0 bg-black/80 bg-opacity-90 h-full flex items-center justify-center z-50 p-4"
+          onClick={() => setSelectedImage(null)}
         >
-          <div className="relative max-w-full max-h-full" onClick={(e) => e.stopPropagation()} >
+          <div className="relative max-w-full max-h-full" onClick={(e) => e.stopPropagation()}>
             <img
               src={selectedImage}
               alt={hotel.name}
@@ -175,6 +180,3 @@ const isUserHotelOwner = trimmedLoginUserId === trimmedHotelUserId;
 };
 
 export default Detail;
-
-
-

@@ -44,6 +44,7 @@ const MyBookings = () => {
   const { data: hotels, isLoading, isError } = useQuery({
     queryKey: ["fetchMyBookings"],
     queryFn: () => apiClient.fetchmyBookings(),
+    staleTime: 10 * 60 * 1000,
     refetchOnWindowFocus: false,
   });
   
@@ -63,7 +64,7 @@ const MyBookings = () => {
   });
 
   const handleCancelClick = (booking: Booking) => {
-    if (booking.isCancelled) return; // Don't allow cancelling already cancelled bookings
+    if (booking.isCancelled) return;
     setSelectedBooking(booking);
     setShowCancelModal(true);
   };

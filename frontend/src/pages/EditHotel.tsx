@@ -22,7 +22,6 @@ const EditHotel = () => {
         mutationFn: apiClient.updateMyHotelById,
         onSuccess: () => {
             queriClient.invalidateQueries({queryKey:["fetchMyHotelById"]})
-            queriClient.invalidateQueries({queryKey:["fetchlatest"]})
             queriClient.invalidateQueries({queryKey:["fetchHotelById"]})
             showToast({ message: "Hotel Saved!", type: "SUCCESS" })
         },
