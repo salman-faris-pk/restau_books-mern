@@ -16,20 +16,36 @@ class EmailVerifier {
   }
 
   private async directSMTPVerify(email: string): Promise<boolean | null> {
+
+    if (process.env.RENDER) {
+      return null;
+    }
+
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      return false;
+    }
+
+    const domain = email.split('@')[1];
+    let smtpServer = `mx.${domain}`;
+    
+    if (domain === 'gmail.com') smtpServer = 'gmail-smtp-in.l.google.com';
+    if (domain === 'yahoo.com') smtpServer = 'mta5.am0.yahoodns.net';
+    if (domain === 'outlook.com') smtpServer = 'outlook-com.olc.protection.outlook.com';
+
     return new Promise((resolve) => {
-      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-        return resolve(false);
-      }
-
-      const domain = email.split('@')[1];
-      const smtpServer = domain === 'gmail.com' 
-        ? 'gmail-smtp-in.l.google.com' 
-        : `mx.${domain}`;
-
       const socket = net.createConnection(25, smtpServer);
-      socket.setTimeout(5000);
+      socket.setTimeout(10000);
 
       let responseData = '';
+      let responded = false;
+
+      const cleanUp = () => {
+        if (!responded) {
+          responded = true;
+          socket.end();
+          resolve(null);
+        }
+      };
 
       socket.on('connect', () => {
         socket.write([
@@ -43,29 +59,19 @@ class EmailVerifier {
       socket.on('data', (data: Buffer) => {
         responseData += data.toString();
         if (responseData.includes('250 2.1.5')) {
+          responded = true;
           socket.end();
           resolve(true);
         } else if (responseData.includes('550')) {
+          responded = true;
           socket.end();
           resolve(false);
         }
       });
 
-      socket.on('error', () => {
-        socket.end();
-        resolve(null);
-      });
-
-      socket.on('timeout', () => {
-        socket.end();
-        resolve(null);
-      });
-
-      socket.on('end', () => {
-        if (!responseData.includes('250 2.1.5') && !responseData.includes('550')) {
-          resolve(null);
-        }
-      });
+      socket.on('error', cleanUp);
+      socket.on('timeout', cleanUp);
+      socket.on('end', cleanUp);
     });
   }
 
@@ -73,16 +79,25 @@ class EmailVerifier {
     const domain = email.split('@')[1];
     try {
       const mxRecords = await dns.resolveMx(domain);
-      if (mxRecords && mxRecords.length > 0) return true;
+      if (mxRecords?.length > 0) return true;
 
-      const aRecords = await dns.resolve(domain);
-      return aRecords && aRecords.length > 0;
+      try {
+        const records = await Promise.any([
+          dns.resolve(domain),
+          dns.resolve4(domain),
+          dns.resolve6(domain)
+        ]);
+        return records?.length > 0;
+      } catch {
+        return false;
+      }
     } catch {
       return false;
     }
   }
 
-  public async verifyEmail(email: string): Promise<boolean | null> {
+  public async verifyEmail(email: string): Promise<boolean> {
+
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
       return false;
     }
@@ -94,22 +109,16 @@ class EmailVerifier {
       }
     }
 
-    const smtpResult = await this.directSMTPVerify(email);
-    if (smtpResult !== null) {
-      this.cache.set(email, {
-        valid: smtpResult,
-        timestamp: Date.now()
-      });
-      return smtpResult;
-    }
+    const result = process.env.RENDER 
+      ? await this.verifyViaDNS(email)
+      : await this.directSMTPVerify(email) ?? await this.verifyViaDNS(email);
 
-    const dnsResult = await this.verifyViaDNS(email);
     this.cache.set(email, {
-      valid: dnsResult,
+      valid: result,
       timestamp: Date.now()
     });
 
-    return dnsResult;
+    return result;
   }
 
   public clearCache(): void {
