@@ -17,7 +17,6 @@ class EmailVerifier {
 
   private async directSMTPVerify(email: string): Promise<boolean | null> {
     return new Promise((resolve) => {
-
       if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
         return resolve(false);
       }
@@ -42,7 +41,6 @@ class EmailVerifier {
       });
 
       socket.on('data', (data: Buffer) => {
-
         responseData += data.toString();
         if (responseData.includes('250 2.1.5')) {
           socket.end();
@@ -53,20 +51,17 @@ class EmailVerifier {
         }
       });
 
-      socket.on('error', (err) => {
-        console.error(`SMTP verification error for ${email}:`, err);
+      socket.on('error', () => {
         socket.end();
         resolve(null);
       });
 
       socket.on('timeout', () => {
         socket.end();
-        console.error(`SMTP verification timeout for ${email}`);
         resolve(null);
       });
 
       socket.on('end', () => {
-
         if (!responseData.includes('250 2.1.5') && !responseData.includes('550')) {
           resolve(null);
         }
@@ -78,18 +73,16 @@ class EmailVerifier {
     const domain = email.split('@')[1];
     try {
       const mxRecords = await dns.resolveMx(domain);
-      if (mxRecords.length > 0) return true;
+      if (mxRecords && mxRecords.length > 0) return true;
 
       const aRecords = await dns.resolve(domain);
-      return aRecords.length > 0;
-    } catch (err) {
-      console.error(`DNS verification failed for ${email}:`, err);
+      return aRecords && aRecords.length > 0;
+    } catch {
       return false;
     }
   }
 
-  public async verifyEmail(email: string): Promise<boolean> {
-
+  public async verifyEmail(email: string): Promise<boolean | null> {
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
       return false;
     }
@@ -101,18 +94,22 @@ class EmailVerifier {
       }
     }
 
-    let result = await this.directSMTPVerify(email);
-    
-    if (result === null) {
-      result = await this.verifyViaDNS(email);
+    const smtpResult = await this.directSMTPVerify(email);
+    if (smtpResult !== null) {
+      this.cache.set(email, {
+        valid: smtpResult,
+        timestamp: Date.now()
+      });
+      return smtpResult;
     }
 
+    const dnsResult = await this.verifyViaDNS(email);
     this.cache.set(email, {
-      valid: result,
+      valid: dnsResult,
       timestamp: Date.now()
     });
 
-    return result;
+    return dnsResult;
   }
 
   public clearCache(): void {

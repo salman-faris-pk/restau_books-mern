@@ -13,7 +13,7 @@ import { connectToDatabase } from "./config/db";
 import cloudinaryConfig from "./config/cloudinary";
 
 
-const port=process.env.PORT || 7000;
+const port=process.env.PORT || 7017;
 
 const limiter = rateLimit({
   windowMs: 60 * 1000,

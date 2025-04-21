@@ -12,13 +12,7 @@ const Register=async(req:Request, res:Response): Promise<void> => {
    try {
 
     const isEmailValid= await emailVerifier.verifyEmail(req.body.email);
-    
-    if (isEmailValid === null) {
-      res.status(503).json({
-        message: "Could not verify email at this time. Please try again later.",
-      });
-      return;
-    }
+    console.log(isEmailValid);
     
     if (isEmailValid === false) {
       res.status(400).json({
@@ -26,6 +20,15 @@ const Register=async(req:Request, res:Response): Promise<void> => {
       });
       return;
     };
+     
+    if (isEmailValid === null) {
+      res.status(503).json({
+        message: "Could not verify email at this time. Please try again later.",
+      });
+      return;
+    }
+    
+   
     
     let user= await User.findOne({
       email: req.body.email,
