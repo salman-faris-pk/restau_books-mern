@@ -20,12 +20,12 @@ const Register=async(req:Request, res:Response): Promise<void> => {
       return;
     }
     
-    if (!isEmailValid) {
-      res.status(401).json({
+    if (isEmailValid === false) {
+      res.status(400).json({
         message: "Invalid email address. Please provide a valid email.",
       });
       return;
-    }
+    };
     
     let user= await User.findOne({
       email: req.body.email,
