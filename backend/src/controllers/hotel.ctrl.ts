@@ -359,10 +359,10 @@ const constructSearchQuery= (queryParams:any) => {
     
     let constructedQuery: any = {};
 
-    if(queryParams.destination) {            //it query the data of city or country which is true
+    if(queryParams.destination) {        
        constructedQuery.$or = [
-        {city: new RegExp(queryParams.destination, "i")},
-        {country: new RegExp(queryParams.destination, "i")}
+        { city: { $regex: queryParams.destination, $options: 'i' } },
+        { country: { $regex: queryParams.destination, $options: 'i' } }
        ]
     };
 

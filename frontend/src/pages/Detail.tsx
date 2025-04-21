@@ -139,7 +139,7 @@ const Detail = () => {
 
       {selectedImage && (
         <div
-          className="fixed inset-0 bg-black/80 bg-opacity-90 h-full flex items-center justify-center z-50 p-4"
+          className="fixed -inset-6 bg-black/80 bg-opacity-90 h-full flex items-center justify-center z-50 p-4"
           onClick={() => setSelectedImage(null)}
         >
           <div className="relative max-w-full max-h-full" onClick={(e) => e.stopPropagation()}>
