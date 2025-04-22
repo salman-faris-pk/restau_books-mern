@@ -11,6 +11,7 @@ import Pagination from "../components/Pagination";
 import { MdArrowForwardIos } from "react-icons/md";
 import SearchSkeleton from "../components/SearchSkeleton";
 import { useFilterStore } from "../stores/filterStore";
+import { RxCross2 } from 'react-icons/rx';
 
 
 
@@ -87,7 +88,7 @@ const Search = () => {
     setPage(1);
   };
 
-  const handleClearFileter=()=>{
+  const handleClearFilter=()=>{
     setSelectedStars([]);
     setSelectedHotelTypes([]);
     setSelectedFacilities([]);
@@ -126,11 +127,13 @@ const Search = () => {
         <h3 className="hidden md:block text-lg font-semibold border-b border-slate-300 pb-5">
           Filter by:
         </h3>
-        <span className="ml-auto -mt-6 px-3 py-1 text-sm cursor-pointer bg-blue-800 text-white rounded-md hover:bg-blue-600 transition"
-        onClick={handleClearFileter}
+      <button
+       onClick={handleClearFilter}
+        className="ml-auto -mt-6 p-2 text-gray-500 hover:text-gray-700 bg-white border border-gray-200 rounded-full hover:bg-gray-50 transition-all"
+        aria-label="Clear"
         >
-          Clear
-         </span>
+       <RxCross2 className="w-3.5 h-3.5" />
+      </button>
       </div>
         
         
