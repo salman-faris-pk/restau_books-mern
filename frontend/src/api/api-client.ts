@@ -164,7 +164,7 @@ export const SearchHotels =async(searchParams: SearchParams) : Promise<HotelSear
    queryParams.append("checkOut", searchParams.checkOut || "");
    queryParams.append("adultCount", searchParams.adultCount || "");
    queryParams.append("childCount", searchParams.childCount || "");
-   queryParams.append("page", searchParams.page || "");
+   queryParams.append("page", searchParams.page || "1");
    queryParams.append("maxPrice", searchParams.maxPrice || "");
    queryParams.append("sortOption", searchParams.sortOption || "");
 
@@ -175,6 +175,7 @@ export const SearchHotels =async(searchParams: SearchParams) : Promise<HotelSear
    searchParams.types?.forEach((type) => queryParams.append("types", type));
    searchParams.stars?.forEach((star) => queryParams.append("stars", star));
 
+  
    const response= await axiosInstance.get(`/hotels/search?${queryParams}`);
 
    if(response.status !== 200) {

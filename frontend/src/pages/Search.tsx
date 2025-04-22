@@ -10,19 +10,30 @@ import SearchResultsCard from "../components/SearchResultsCard";
 import Pagination from "../components/Pagination";
 import { MdArrowForwardIos } from "react-icons/md";
 import SearchSkeleton from "../components/SearchSkeleton";
+import { useFilterStore } from "../stores/filterStore";
 
 
 
 const Search = () => {
   const search = useSearchContext();
   const [showFilter, setShowFilter] = useState<boolean>(false);
-  const [page, setPage] = useState<number>(1);
-  const [selectedStars, setSelectedStars] = useState<string[]>([]);
-  const [selectedHotelTypes, setSelectedHotelTypes] = useState<string[]>([]);
-  const [selectedFacilities, setSelectedFacilities] = useState<string[]>([]);
-  const [selectedPrice, setSelectedPrice] = useState<number | undefined>();
-  const [sortOption, setSortOption] = useState<string>("");
 
+  const {
+    selectedStars,
+    selectedHotelTypes,
+    selectedFacilities,
+    selectedPrice,
+    sortOption,
+    page,
+    setSelectedStars,
+    setSelectedHotelTypes,
+    setSelectedFacilities,
+    setSelectedPrice,
+    setSortOption,
+    setPage
+  } = useFilterStore();
+
+  
   const searchParams = {
     destination: search.destination,
     checkIn: search.checkIn.toISOString(),
@@ -41,10 +52,11 @@ const Search = () => {
     data: hotelData, isLoading,error,isFetching} = useQuery({
     queryKey: ["searchHotels", searchParams],
     queryFn: () => apiClient.SearchHotels(searchParams),
-    staleTime: 2 * 60 * 1000,
+    staleTime: 3 * 60 * 1000,
     placeholderData: keepPreviousData,
   });
 
+  
   const handleStarsChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const starRating = event.target.value;
     setSelectedStars((prevStars) =>
@@ -52,6 +64,7 @@ const Search = () => {
         ? [...prevStars, starRating]
         : prevStars.filter((star) => star !== starRating)
     );
+    setPage(1);
   };
 
   const handleHotelTypeChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -61,6 +74,7 @@ const Search = () => {
         ? [...prevHotelTypes, hotelType]
         : prevHotelTypes.filter((hotel) => hotel !== hotelType)
     );
+    setPage(1);
   };
 
   const handleFacilityChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -70,6 +84,16 @@ const Search = () => {
         ? [...prevFacilities, facility]
         : prevFacilities.filter((prevFacility) => prevFacility !== facility)
     );
+    setPage(1);
+  };
+
+  const handleClearFileter=()=>{
+    setSelectedStars([]);
+    setSelectedHotelTypes([]);
+    setSelectedFacilities([]);
+    setSelectedPrice(undefined);
+    setSortOption("");
+    setPage(1);
   };
 
   if (isLoading) {
@@ -90,15 +114,26 @@ const Search = () => {
     <div className="grid grid-cols-1 lg:grid-cols-[250px_1fr] gap-5 px-2 md:px-0">
       {/* Filters Column */}
       <div className="rounded-lg border border-slate-300 p-5 h-fit lg:sticky lg:top-10">
+        
+      <div className="flex items-center justify-between pb-5">
         <h3 
           className="md:hidden text-xl flex items-center cursor-pointer gap-2 pb-5" 
           onClick={() => setShowFilter(!showFilter)}
         >
           FILTERS <MdArrowForwardIos size={16} className={`text-gray-300 ${showFilter ? "rotate-90" : ""}`}/>
         </h3>
+
         <h3 className="hidden md:block text-lg font-semibold border-b border-slate-300 pb-5">
           Filter by:
         </h3>
+        <span className="ml-auto -mt-6 px-3 py-1 text-sm cursor-pointer bg-blue-800 text-white rounded-md hover:bg-blue-600 transition"
+        onClick={handleClearFileter}
+        >
+          Clear
+         </span>
+      </div>
+        
+        
 
         <div className={`space-y-5 ${showFilter ? "block" : "hidden"} md:block`}>
           <StarRatingFilter
