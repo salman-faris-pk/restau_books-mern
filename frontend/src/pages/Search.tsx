@@ -107,7 +107,8 @@ const Search = () => {
   }
 
   return (
-    <div className="relative">
+    <div className="relative min-h-full">
+      {/* Mobile Filter Button */}
       <button
         onClick={() => setShowFilter(true)}
         className="lg:hidden fixed bottom-6 right-6 z-30 bg-blue-600 text-white p-3 rounded-full shadow-lg flex items-center gap-2"
@@ -116,7 +117,7 @@ const Search = () => {
         <span>Filters</span>
       </button>
 
-      {/* Filter Sidebar (Mobile) */}
+      {/* Filter Sidebar*/}
       <div
         className={`fixed inset-0 z-40 bg-black bg-opacity-50 transition-opacity duration-300 lg:hidden ${
           showFilter ? 'opacity-100 visible' : 'opacity-0 invisible'
@@ -171,7 +172,7 @@ const Search = () => {
       </div>
 
       {/* Main Content */}
-      <div className="grid grid-cols-1 lg:grid-cols-[250px_1fr] gap-5 px-2 md:px-0">
+      <div className="grid grid-cols-1 lg:grid-cols-[250px_1fr] gap-5 px-2 md:px-0 pb-20 lg:pb-0">
         {/* Filters Column (Desktop) */}
         <div className="hidden lg:block rounded-lg border border-slate-300 p-5 h-fit sticky top-10">
           <div className="flex items-center justify-between pb-5">
@@ -207,6 +208,7 @@ const Search = () => {
           </div>
         </div>
         
+        
         {/* Results Column */}
         <div className="flex flex-col gap-5 relative">
           {isFetching && (
@@ -237,9 +239,11 @@ const Search = () => {
           </div>
 
           {hotelData?.data?.length === 0 ? (
-            <p className="text-center font-medium text-gray-500 py-10">
-              No hotels found matching your criteria...
-            </p>
+            <div className="flex flex-col items-center justify-center py-10 min-h-[300px]">
+              <p className="text-center font-medium text-gray-500 mb-6">
+                No hotels found matching your criteria...
+              </p>
+            </div>
           ) : (
             <>
               {hotelData?.data?.map((hotel) => (
