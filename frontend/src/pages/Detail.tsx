@@ -3,11 +3,12 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { AiFillStar } from "react-icons/ai";
 import { useParams } from "react-router-dom";
 import GuestInfoForm from "../forms/GuestInfoForm/GuestInfoForm";
-import { CiBookmark } from "react-icons/ci";
-import { IoBookmark } from "react-icons/io5";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useAppContext } from "../contexts/AppContext";
 import Skeleton from "../components/Skeleton";
+import WishlistButton from "../components/WishlistButton";
+import HotelImageGrid from "../components/HotelImageGrid";
+
 
 const Detail = () => {
   const queryClient = useQueryClient();
@@ -33,7 +34,7 @@ const Detail = () => {
   const trimmedHotelUserId = hotel?.userId?.trim();
   const isUserHotelOwner = trimmedLoginUserId === trimmedHotelUserId;
 
-  const { mutate: toggleWishlist } = useMutation({
+  const { mutate: toggleWishlist, isPending: isWishlistUpdating } = useMutation({
     mutationFn: async () => {
       if (currentStatus?.inWishlist) {
         return await apiClient.removeWishlist(hotelId as string);
@@ -42,7 +43,6 @@ const Detail = () => {
       }
     },
     onMutate: async () => {
-
       await queryClient.cancelQueries({ queryKey: ["fetchStatus", hotelId] });
 
       const previousStatus = queryClient.getQueryData(["fetchStatus", hotelId]);
@@ -63,10 +63,18 @@ const Detail = () => {
       console.error(err);
     },
     onSettled: () => {
-      queryClient.invalidateQueries({ queryKey: ["fetchStatus", hotelId] }); //Always refetch after error or success
+      queryClient.invalidateQueries({ queryKey: ["fetchStatus", hotelId] }); // //Always refetch after even its  error or success
       queryClient.invalidateQueries({ queryKey: ["wishlist"] });
     },
   });
+
+  const handleImageClick = useCallback((image: string) => {
+    setSelectedImage(image);
+  }, []);
+
+  const handleCloseImage = useCallback(() => {
+    setSelectedImage(null);
+  }, []);
 
   useEffect(() => {
     if (selectedImage) {
@@ -95,52 +103,26 @@ const Detail = () => {
             <AiFillStar className="fill-yellow-400" key={index} />
           ))}
         </span>
-        <div className="flex justify-between cursor-pointer">
+        <div className="flex justify-between items-center">
           <h1 className="text-3xl font-bold">{hotel.name}</h1>
-          {isLoggedIn && hotel?.userId && (
-            <span className={`${isUserHotelOwner ? "hidden" : "block"}`}>
-              {currentStatus?.inWishlist ? (
-                <IoBookmark 
-                  size={42} 
-                  onClick={() => toggleWishlist()} 
-                  className="text-blue-500 hover:text-blue-700 transition-colors"
-                />
-              ) : (
-                <CiBookmark 
-                  size={42} 
-                  onClick={() => toggleWishlist()} 
-                  className="hover:text-blue-500 transition-colors"
-                />
-              )}
-            </span>
+          {isLoggedIn && hotel?.userId && !isUserHotelOwner && (
+            <div className="w-10 h-10 flex items-center justify-center">
+              <WishlistButton
+                isUpdating={isWishlistUpdating}
+                isInWishlist={currentStatus?.inWishlist || false}
+                onClick={toggleWishlist}
+              />
+            </div>
           )}
         </div>
       </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {hotel.imageUrls.map((image, i) => (
-          <div className="h-[300px] relative group" key={i}>
-            <img
-              src={image}
-              alt={hotel.name}
-              className="rounded-md w-full h-full object-cover object-center"
-            />
-            <div
-              className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-30 transition-all duration-300 rounded-md flex items-center justify-center"
-              onClick={() => setSelectedImage(image)}
-            >
-              <p className="text-white opacity-0 group-hover:opacity-100 transition-opacity duration-300 cursor-pointer">
-                View
-              </p>
-            </div>
-          </div>
-        ))}
-      </div>
+       
+      <HotelImageGrid images={hotel.imageUrls} onImageClick={handleImageClick} />
 
       {selectedImage && (
         <div
-          className="fixed -inset-6 bg-black/80 bg-opacity-90 h-full flex items-center justify-center z-50 p-4"
-          onClick={() => setSelectedImage(null)}
+          className="fixed -inset-6 bg-black/80 bg-opacity-90 flex items-center justify-center z-50 p-4"
+          onClick={handleCloseImage}
         >
           <div className="relative max-w-full max-h-full" onClick={(e) => e.stopPropagation()}>
             <img
@@ -150,7 +132,7 @@ const Detail = () => {
             />
             <button
               className="absolute top-4 right-4 bg-white text-black rounded-full font-medium w-10 h-10 flex items-center justify-center hover:bg-gray-200 transition-colors duration-200"
-              onClick={() => setSelectedImage(null)}
+              onClick={handleCloseImage}
             >
               X
             </button>
@@ -168,7 +150,7 @@ const Detail = () => {
 
       <div className="grid grid-cols-1 lg:grid-cols-[2fr_1fr]">
         <div className="whitespace-pre-line">{hotel.description}</div>
-        <div className="h-fit">
+        <div className="h-fit mt-7 md:mt-2">
           <GuestInfoForm
             pricePerNight={hotel.pricePerNight}
             hotelId={hotel._id}
