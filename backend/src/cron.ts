@@ -6,7 +6,7 @@ import https from "https"
 const URL ='https://restau-booking-mern.onrender.com/';
 
 
-const CronJob = cron.schedule('*/14 * * * *', function () {
+const CronJob = cron.schedule('*/13 * * * *', function () {
     https
       .get(URL, (res) => {
         if (res.statusCode === 200) {
