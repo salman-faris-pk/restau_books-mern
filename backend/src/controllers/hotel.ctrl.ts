@@ -1,6 +1,6 @@
 import {Response,Request} from "express"
 import Hotel from "../models/hotel";
-import { BookingType, HotelSearchResponse } from "../types/types";
+import { HotelSearchResponse } from "../types/types";
 import Stripe from "stripe"
 import mongoose from "mongoose";
 import User from "../models/user";
@@ -85,274 +85,213 @@ const Searchhotel = async (req: Request, res: Response): Promise<void> => {
   };
   
 
-  const StripePaymentIntent =async(req:Request,res:Response): Promise<void> => {
 
+const StripePaymentIntent = async (req: Request, res: Response): Promise<void> => {
+  try {
     const { numberOfNights } = req.body;
-    
     const hotelId = req.params.hotelId;
-    const user=await User.findById(req.userId);
+    const user = await User.findById(req.userId);
+
     if (!user) {
       res.status(400).json({ message: "User not found" });
       return;
-  }
+    }
 
-    const hotel= await Hotel.findById(hotelId);
-    if(!hotel) {
-      res.status(400).json({ message: "Hotel not found" })
+    const hotel = await Hotel.findById(hotelId);
+    if (!hotel) {
+      res.status(400).json({ message: "Hotel not found" });
       return;
-    };
+    }
 
-    const totalCost= hotel.pricePerNight * numberOfNights;
+    const totalCost = hotel.pricePerNight * numberOfNights;
+    const { addresscity, addressline1, addressline2, addresspostcode, addresstate } = generateFakeAddress();
 
-     const {addresscity,addressline1,addressline2,addresspostcode,addresstate}=generateFakeAddress()
-
-    const paymentIntent= await stripe.paymentIntents.create({
+    const paymentIntent = await stripe.paymentIntents.create({
       amount: totalCost * 100,
       currency: "inr",
       description: `Booking for ${hotel.name} - ${numberOfNights} nights`,
-      metadata: {
-        hotelId,
-        userId: req.userId,
-      },
-      shipping: { 
-        name: user.firstName + " " + user.lastName,
+      metadata: { hotelId, userId: req.userId },
+      shipping: {
+        name: `${user.firstName} ${user.lastName}`,
         address: {
-                line1: addressline1 || "N/A",
-                line2: addressline2 || "N/A",
-                city: addresscity || "N/A",
-                state: addresstate || "N/A",
-                postal_code: addresspostcode || "N/A",
-                country: "IN",
+          line1: addressline1 || "N/A",
+          line2: addressline2 || "N/A",
+          city: addresscity || "N/A",
+          state: addresstate || "N/A",
+          postal_code: addresspostcode || "N/A",
+          country: "IN",
         },
-      }
+      },
     });
-      
-    if(!paymentIntent.client_secret) {
-      res.status(500).json({ message: "Error creating payment intent" })
+
+    if (!paymentIntent.client_secret) {
+      res.status(500).json({ message: "Error creating payment intent" });
       return;
-    };
+    }
 
-    const response={
+    res.json({
       paymentIntent: paymentIntent.id,
-      clientSecret: paymentIntent.client_secret.toString(),
-      totalCost
+      clientSecret: paymentIntent.client_secret,
+      totalCost,
+    });
+  } catch (error) {
+    console.error("StripePaymentIntent error:", error);
+    res.status(500).json({ message: "Something went wrong while creating payment" });
+  }
+};
+
+
+const BookTheHotel = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const { paymentIntentId, numberOfNights } = req.body;
+    const hotelId = req.params.hotelId;
+
+    const paymentIntent = await stripe.paymentIntents.retrieve(paymentIntentId as string);
+    if (!paymentIntent) {
+      res.status(400).json({ message: "Payment intent not found" });
+      return;
+    }
+
+    if (paymentIntent.metadata.hotelId !== hotelId || paymentIntent.metadata.userId !== req.userId) {
+      res.status(400).json({ message: "Payment intent mismatch" });
+      return;
+    }
+
+    if (paymentIntent.status !== "succeeded") {
+      res.status(400).json({ message: `Payment not succeeded. Status: ${paymentIntent.status}` });
+      return;
+    }
+
+    const newBookingId = new mongoose.Types.ObjectId();
+    const newBooking = {
+      ...req.body,
+      userId: req.userId,
+      _id: newBookingId,
+      hotelId,
     };
 
-    res.send(response); 
+    const hotel = await Hotel.findByIdAndUpdate(
+      hotelId,
+      { $push: { bookings: newBooking } },
+      { new: true }
+    );
 
-  };
+    if (!hotel) {
+      res.status(400).json({ message: "Hotel not found" });
+      return;
+    }
 
+    const totalCost = paymentIntent.amount / 100;
+    const hotelOwner = await User.findByIdAndUpdate(
+      hotel.userId,
+      { $inc: { earned: totalCost } },
+      { new: true }
+    );
 
-  const BookTheHotel = async(req:Request,res:Response):Promise<void> => {
-     
-    const session= await mongoose.startSession();
-    session.startTransaction();
+    if (!hotelOwner) {
+      res.status(400).json({ message: "Hotel owner not found" });
+      return;
+    }
+
+    const user = await User.findById(req.userId);
+    if (!user) {
+      res.status(400).json({ message: "User not found" });
+      return;
+    }
 
     try {
-      const {paymentIntentId,numberOfNights}= req.body;
-      const hotelId=req.params.hotelId;
-          
-      const paymentIntent = await stripe.paymentIntents.retrieve(paymentIntentId as string);
-
-      if (!paymentIntent) {
-        await session.abortTransaction();
-        session.endSession();
-        res.status(400).json({ message: "payment intent not found" })
-        return;
-      };
-    
-
-      if (paymentIntent.metadata.hotelId !== req.params.hotelId || paymentIntent.metadata.userId !== req.userId) {
-         await session.abortTransaction();
-        session.endSession();
-        res.status(400).json({ message: "payment intent mismatch" })
-        return;
-      };
-
-      if (paymentIntent.status !== "succeeded") {
-        await session.abortTransaction();
-        session.endSession();
-        res.status(400).json({message: `payment intent not succeeded. Status: ${paymentIntent.status}`})
-        return;
-      };
-      
-      const newBookingId = new mongoose.Types.ObjectId();
-      const newBooking:BookingType = {
-        ...req.body,
-        userId: req.userId,
-        _id:newBookingId,
-        hotelId,
-      };
-
-      const hotel = await Hotel.findOneAndUpdate(
-        { _id: hotelId },
-        {
-          $push: { bookings: newBooking },
-        },
-        { session, new:true }
-      );
-
-      if (!hotel) {
-        await session.abortTransaction();
-        session.endSession();
-        res.status(400).json({ message: "hotel not found" })
-        return;
-      };
-
-      const totalCost = paymentIntent.amount / 100;
-      const hotelOwner = await User.findOneAndUpdate(
-        { _id: hotel.userId },
-        { $inc: { earned: totalCost } },
-        { session, new: true }
-      );
-  
-      if (!hotelOwner) {
-        await session.abortTransaction();
-        session.endSession();
-        res.status(400).json({ message: "Hotel owner not found" });
-        return;
-      }
-
-      const user = await User.findById(req.userId).session(session);
-      if (!user) {
-        await session.abortTransaction();
-        session.endSession();
-        res.status(400).json({ message: "User not found" });
-        return;
-      };
-             
-      try {
-         await createAndSendInvoice({
+      await createAndSendInvoice({
         user,
         hotel,
         bookingId: newBooking._id,
-        paymentintentId:paymentIntentId,
+        paymentintentId: paymentIntentId,
         amount: totalCost,
-        numberOfNights
+        numberOfNights,
       });
-        
-        await hotel.save({ session });
-    
     } catch (invoiceError) {
       console.error("Invoice creation failed:", invoiceError);
     }
 
-      await session.commitTransaction();
-      session.endSession(); 
-
-      res.status(200).send();
-
-      
-    } catch (error) {
-      await session.abortTransaction();
-      session.endSession();
-      res.status(500).json({ message: "something went wrong" });
-    }
-  };
-
-
-  const CancelBooking = async (req: Request, res: Response): Promise<void> => {
-    const session = await mongoose.startSession();
-    session.startTransaction();
-
-    try {
-        const { paymentIntentId } = req.body;
-        const hotelId = req.params.hotelId;
-        const userId = req.userId;
-
-        const paymentIntent = await stripe.paymentIntents.retrieve(paymentIntentId as string);
-        
-        if (!paymentIntent) {
-            await session.abortTransaction(); 
-            session.endSession();
-            res.status(400).json({ message: "Payment intent not found" });
-            return;
-        }
-
-        if (paymentIntent.metadata.hotelId !== hotelId || paymentIntent.metadata.userId !== userId) {
-            await session.abortTransaction();
-            session.endSession();
-            res.status(400).json({ message: "Payment intent mismatch" });
-            return;
-        }
-
-        if (paymentIntent.status === "succeeded") {
-            await stripe.refunds.create({
-                payment_intent: paymentIntentId as string,
-            });
-        }
-
-        const hotel = await Hotel.findById(hotelId).session(session);
-        if (!hotel) {
-            await session.abortTransaction();
-            session.endSession();
-            res.status(400).json({ message: "Hotel not found" });
-            return;
-        }
-
-        const bookingIndex = hotel.bookings.findIndex(
-            (booking) => booking.paymentIntentId === paymentIntentId
-        );
-
-        if (bookingIndex === -1) {
-            await session.abortTransaction();
-            session.endSession();
-            res.status(400).json({ message: "Booking not found" });
-            return;
-        }
-
-        hotel.bookings[bookingIndex].isCancelled = true;
-        
-        await hotel.save({ session });
-
-        const booking = hotel.bookings[bookingIndex];
-        const totalCost = booking.totalCost;
-
-        await User.findOneAndUpdate(
-            { _id: hotel.userId },
-            { $inc: { earned: -totalCost } },
-            { session }
-        );
-
-        const user = await User.findById(userId).session(session);
-        if (!user) {
-            await session.abortTransaction();
-            session.endSession();
-            res.status(400).json({ message: "User not found" });
-            return;
-        }
-        
-        try {
-            await CancellationInvoice({
-                user,
-                hotel: {
-                    _id: hotel._id,
-                    name: hotel.name
-                },
-                bookingId: booking._id.toString(),
-                paymentintentId: paymentIntentId,
-                amount: totalCost,
-                numberOfNights: calculateNights(booking.checkIn, booking.checkOut)
-            });
-        } catch (invoiceError) {
-            console.error("Cancellation invoice failed:", invoiceError);
-        }
-
-        await session.commitTransaction();
-        session.endSession();
-
-        res.status(200).json({ 
-            message: "Booking cancelled and check gmail for more details",
-            isCancelled: true
-        });
-    } catch (error) {
-        await session.abortTransaction();
-        session.endSession();
-        console.error("Error cancelling booking:", error);
-        res.status(500).json({ message: "Something went wrong" });
-    }
+    res.status(200).json({ message: "Booking confirmed successfully" });
+  } catch (error) {
+    console.error("BookTheHotel error:", error);
+    res.status(500).json({ message: "Something went wrong while booking" });
+  }
 };
 
+
+const CancelBooking = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const { paymentIntentId } = req.body;
+    const hotelId = req.params.hotelId;
+    const userId = req.userId;
+
+    const paymentIntent = await stripe.paymentIntents.retrieve(paymentIntentId as string);
+    if (!paymentIntent) {
+      res.status(400).json({ message: "Payment intent not found" });
+      return;
+    }
+
+    if (paymentIntent.metadata.hotelId !== hotelId || paymentIntent.metadata.userId !== userId) {
+      res.status(400).json({ message: "Payment intent mismatch" });
+      return;
+    }
+
+    if (paymentIntent.status === "succeeded") {
+      await stripe.refunds.create({ payment_intent: paymentIntentId as string });
+    }
+
+    const hotel = await Hotel.findById(hotelId);
+    if (!hotel) {
+      res.status(400).json({ message: "Hotel not found" });
+      return;
+    }
+
+    const bookingIndex = hotel.bookings.findIndex(
+      (booking) => booking.paymentIntentId === paymentIntentId
+    );
+
+    if (bookingIndex === -1) {
+      res.status(400).json({ message: "Booking not found" });
+      return;
+    }
+
+    hotel.bookings[bookingIndex].isCancelled = true;
+    await hotel.save();
+
+    const booking = hotel.bookings[bookingIndex];
+    const totalCost = booking.totalCost;
+
+    await User.findByIdAndUpdate(hotel.userId, { $inc: { earned: -totalCost } });
+
+    const user = await User.findById(userId);
+    if (!user) {
+      res.status(400).json({ message: "User not found" });
+      return;
+    }
+
+    try {
+      await CancellationInvoice({
+        user,
+        hotel: { _id: hotel._id, name: hotel.name },
+        bookingId: booking._id.toString(),
+        paymentintentId: paymentIntentId,
+        amount: totalCost,
+        numberOfNights: calculateNights(booking.checkIn, booking.checkOut),
+      });
+    } catch (invoiceError) {
+      console.error("Cancellation invoice failed:", invoiceError);
+    }
+
+    res.status(200).json({
+      message: "Booking cancelled and invoice sent",
+      isCancelled: true,
+    });
+  } catch (error) {
+    console.error("CancelBooking error:", error);
+    res.status(500).json({ message: "Something went wrong while cancelling" });
+  }
+};
 
 
 const constructSearchQuery= (queryParams:any) => {
